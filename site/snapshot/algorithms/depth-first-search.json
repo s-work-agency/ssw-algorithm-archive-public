@@ -1,0 +1,203 @@
+{
+  "schemaVersion": "2.1",
+  "id": "depth-first-search",
+  "alternatives": [
+    "breadth-first-search"
+  ],
+  "documentation": {
+    "whenToUse": [
+      "연결 요소, 경로 존재, 사이클, 백트래킹 구조를 탐색할 때 적합해요."
+    ],
+    "avoidWhen": [
+      "가중치 없는 그래프의 최소 단계 경로가 필요하면 너비 우선 탐색을 사용해요."
+    ],
+    "tradeoffs": [
+      "활성 경로 중심이라 메모리가 적을 수 있지만 깊은 그래프에서는 스택이 넘칠 수 있어요."
+    ],
+    "pitfalls": [
+      "순환 그래프에서 방문 처리를 늦게 하면 무한 탐색이 발생하고 이웃 순서에 따라 결과가 달라져요."
+    ]
+  },
+  "contract": {
+    "input": {
+      "vertices": "unique vertex IDs",
+      "edges": "ordered directed edges",
+      "source": "start vertex ID"
+    },
+    "output": {
+      "order": "preorder traversal using outgoing edge input order"
+    },
+    "errors": [
+      {
+        "code": "INVALID_INPUT"
+      },
+      {
+        "code": "INVALID_SOURCE"
+      },
+      {
+        "code": "INVALID_EDGE"
+      }
+    ],
+    "mutation": "input-must-not-mutate"
+  },
+  "complexity": {
+    "time": "O(V + E)",
+    "space": "O(V)"
+  },
+  "preconditions": [
+    "vertices is an array of unique string vertex IDs",
+    "source is a vertex",
+    "every edge is an object with string endpoints",
+    "every edge endpoint is a declared vertex",
+    "outgoing neighbors follow edge input order"
+  ],
+  "implementations": {
+    "java": {
+      "status": "operational",
+      "entryPoint": "com.ssw.archive.graph.DepthFirstSearch.execute",
+      "source": {
+        "primaryFile": "src/main/java/com/ssw/archive/graph/DepthFirstSearch.java",
+        "files": {
+          "src/main/java/com/ssw/archive/graph/DepthFirstSearch.java": {
+            "id": "source:src/main/java/com/ssw/archive/graph/DepthFirstSearch.java",
+            "path": "src/main/java/com/ssw/archive/graph/DepthFirstSearch.java",
+            "sha256": "786bbd23b8a75633381aa03858e8d2ab2ccddf77177ee05af774287cc8642d1e",
+            "byteLength": 3042
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "javascript": {
+      "status": "operational",
+      "entryPoint": "DepthFirstSearch.execute",
+      "source": {
+        "primaryFile": "src/main/javascript/graph/depth-first-search.js",
+        "files": {
+          "src/main/javascript/graph/depth-first-search.js": {
+            "id": "source:src/main/javascript/graph/depth-first-search.js",
+            "path": "src/main/javascript/graph/depth-first-search.js",
+            "sha256": "d5e4b95042441df5512f870feff90018f8298097311f35c88af184624dd4a60a",
+            "byteLength": 2396
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "csharp": {
+      "status": "operational",
+      "entryPoint": "Ssw.Archive.Graph.DepthFirstSearch.Execute",
+      "source": {
+        "primaryFile": "src/main/csharp/Graph/DepthFirstSearch.cs",
+        "files": {
+          "src/main/csharp/Graph/DepthFirstSearch.cs": {
+            "id": "source:src/main/csharp/Graph/DepthFirstSearch.cs",
+            "path": "src/main/csharp/Graph/DepthFirstSearch.cs",
+            "sha256": "aaae75c25a145355cc882925751aa3991d6c10abf33ab93ff870470ce2278efa",
+            "byteLength": 3075
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "typescript": {
+      "status": "reserved",
+      "plannedEntryPoint": "execute",
+      "plannedSourcePath": "src/main/typescript/graph/depth-first-search.ts",
+      "plannedBasicTestPath": "src/test/typescript/graph/depth-first-search.ts"
+    },
+    "python": {
+      "status": "reserved",
+      "plannedEntryPoint": "graph.depth_first_search.execute",
+      "plannedSourcePath": "src/main/python/graph/depth_first_search.py",
+      "plannedBasicTestPath": "src/test/python/graph/depth_first_search.py"
+    },
+    "go": {
+      "status": "reserved",
+      "plannedEntryPoint": "graph.ExecuteDepthFirstSearch",
+      "plannedSourcePath": "src/main/go/graph/depth_first_search.go",
+      "plannedBasicTestPath": "src/test/go/graph/depth_first_search.go"
+    },
+    "rust": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw_algorithm_archive::graph::depth_first_search::execute",
+      "plannedSourcePath": "src/main/rust/src/graph/depth_first_search.rs",
+      "plannedBasicTestPath": "src/test/rust/src/graph/depth_first_search.rs"
+    },
+    "kotlin": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw.archive.graph.DepthFirstSearch.execute",
+      "plannedSourcePath": "src/main/kotlin/graph/DepthFirstSearch.kt",
+      "plannedBasicTestPath": "src/test/kotlin/graph/DepthFirstSearch.kt"
+    },
+    "cpp": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw::archive::graph::DepthFirstSearch::execute",
+      "plannedSourcePath": "src/main/cpp/graph/depth_first_search.hpp",
+      "plannedBasicTestPath": "src/test/cpp/graph/depth_first_search.hpp"
+    },
+    "ruby": {
+      "status": "reserved",
+      "plannedEntryPoint": "SSW::Archive::Graph::DepthFirstSearch.execute",
+      "plannedSourcePath": "src/main/ruby/graph/depth_first_search.rb",
+      "plannedBasicTestPath": "src/test/ruby/graph/depth_first_search.rb"
+    }
+  },
+  "vectors": {
+    "depth-first-search-basic": {
+      "path": "test-vectors/valid/depth-first-search-basic.json",
+      "sha256": "a3dc63866e1c6cb4b5622d7a0772fd00d5f19d653d1efee79341ce5870e04858",
+      "byteLength": 5278,
+      "caseCount": 11
+    }
+  },
+  "assets": {
+    "usage-scenario": {
+      "path": "assets/depth-first-search/usage-scenario.json",
+      "sha256": "db3f58b6ce9305afb4beb816168a83199b5ebb4af807816e848c3690df8d7d5d",
+      "byteLength": 2502
+    }
+  }
+}

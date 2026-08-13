@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+      정적 텍스트는 한국어가 기본이고, main.js 가 첫 렌더 전에 저장된 언어로
+      덮어쓴다. data-i18n* 속성이 그 대상과 로케일 키를 함께 들고 있다.
+    -->
+    <meta
+      name="description"
+      data-i18n-content="document.description"
+      content="설명·계약·테스트·언어별 원본 코드와 커버리지 현황을 제공하는 SSW Algorithm Archive"
+    />
+    <title>SSW Algorithm Archive</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <!--
+      main.js 는 module 이라 늦게 실행된다. 저장된 다크 설정을 첫 페인트 전에
+      적용해 흰 화면이 번쩍이지 않게 한다. 저장값이 정확히 "dark" 일 때만
+      적용하므로 이상값·localStorage 차단은 자동으로 라이트가 된다.
+
+      언어도 같은 자리에서 읽어 <html lang> 을 먼저 맞춘다. 문자열 표까지 인라인
+      으로 끌고 들어오지는 않으므로 본문 텍스트는 main.js 가 바꾼다. 새 키가
+      없으면 20차의 이름 표기 키를 승계해 사용자가 골라 둔 설정을 잃지 않는다.
+    -->
+    <script>
+      try {
+        if (
+          localStorage.getItem("ssw-algorithm-archive:theme") === "dark"
+        ) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+        var storedLanguage =
+          localStorage.getItem("ssw-algorithm-archive:language") ??
+          localStorage.getItem("ssw-algorithm-archive:name-language");
+        if (storedLanguage === "en") {
+          document.documentElement.lang = "en";
+        }
+      } catch (error) {
+        /* 비공개 모드 등에서 접근이 막히면 기본 라이트·한국어로 둔다. */
+      }
+    </script>
+    <script type="module" src="./assets/main.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content" data-i18n="skipLink.toContent"
+      >본문으로 건너뛰기</a
+    >
+
+    <div class="app-shell">
+      <!-- 드로어가 열렸을 때만 노출되는 배경. 클릭하면 닫힌다. -->
+      <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
+
+      <aside class="sidebar" id="sidebar">
+        <!--
+          브랜드는 사이트 홈(목록 화면) 링크다. 아래 nav 는 카탈로그 영역 이동만
+          담당하므로 홈 링크는 nav 밖 앵커로 두고 aria-current 도 붙이지 않는다.
+        -->
+        <a class="brand" id="brand-home" href="#list">
+          <span class="brand__mark" aria-hidden="true">SA</span>
+          <span class="brand__text">
+            <!-- 서비스 이름은 고유명사라 로케일을 타지 않는다. -->
+            <span class="brand__name">SSW Algorithm Archive</span>
+            <span class="brand__tagline" data-i18n="brand.tagline"
+              >알고리즘 카탈로그</span
+            >
+          </span>
+        </a>
+
+        <!--
+          사이드바 이동에 맞춰 tablist 대신 nav + 링크로 바꿨다. 각 항목이 실제
+          해시 URL을 갖는 이동이므로 링크가 의미에 맞고, 키보드도 Tab/Enter 로
+          동작해 roving tabindex 가 필요 없다.
+        -->
+        <nav
+          class="sidebar-nav"
+          data-i18n-aria-label="sidebar.navLabel"
+          aria-label="카탈로그 영역"
+        >
+          <p
+            class="nav-label"
+            id="nav-label-catalog"
+            data-i18n="sidebar.groupLabel"
+          >
+            카탈로그
+          </p>
+          <ul class="nav-list" aria-labelledby="nav-label-catalog">
+            <!-- 기본 화면이 목록이라 JS 로드 전에도 활성 표시가 맞다. -->
+            <li>
+              <a
+                id="catalog-tab-list"
+                class="nav-link"
+                href="#list"
+                aria-current="page"
+                data-i18n="sidebar.list"
+                >목록</a
+              >
+            </li>
+            <li>
+              <a
+                id="catalog-tab-coverage"
+                class="nav-link"
+                href="#coverage"
+                data-i18n="sidebar.coverage"
+              >
+                커버리지
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <!--
+          게시 지표는 이동 항목이 아니라 카탈로그의 현재 규모라, nav 밖 사이드바
+          맨 아래에 둔다. 어느 화면에서도 같은 자리에 있어야 해서 화면 콘텐츠가
+          아니라 셸에 붙는다 — 드로어로 접히는 폭에서도 메뉴를 열면 함께 나온다.
+
+          게시 지표는 항목마다 한 줄인 dl 목록으로 그려진다. 준비·로딩·실패
+          문장은 그대로 텍스트 한 줄이라, 두 형태를 다 담을 수 있는 div 로 둔다
+          (p 안에는 dl 을 넣을 수 없다). aria-live 는 첫 로드가 끝나 지표가
+          들어설 때 그 사실만 조용히 알리는 자리라 polite 를 유지한다.
+        -->
+        <div
+          id="catalog-status"
+          aria-live="polite"
+          data-state="loading"
+          data-i18n="status.preparing"
+        >
+          준비 중입니다…
+        </div>
+      </aside>
+
+      <div class="app-main">
+        <header class="topbar">
+          <button
+            id="sidebar-toggle"
+            class="topbar__menu"
+            type="button"
+            aria-expanded="false"
+            aria-controls="sidebar"
+          >
+            <span aria-hidden="true">☰</span>
+            <span class="visually-hidden" data-i18n="topbar.openMenu"
+              >메뉴 열기</span
+            >
+          </button>
+          <h1 id="screen-title" class="topbar__title" data-i18n="screen.list">
+            알고리즘 목록
+          </h1>
+          <div class="topbar__actions">
+            <!--
+              표시 언어는 한국어가 기본이라 JS 로드 전에도 한국어 쪽이 눌린 표시가
+              맞다. 저장된 영문 설정은 main.js 가 첫 렌더 전에 덮어쓴다.
+
+              버튼 라벨은 각 언어의 자기 이름으로 적는다. 언어 선택기는 현재 UI
+              언어와 무관하게 자기 언어로 표기하는 것이 관례라 로케일을 타지 않는다.
+            -->
+            <div
+              class="name-toggle"
+              role="group"
+              data-i18n-aria-label="topbar.languageGroup"
+              aria-label="표시 언어"
+            >
+              <button
+                id="name-language-ko"
+                class="name-toggle__button"
+                type="button"
+                aria-pressed="true"
+                lang="ko"
+              >
+                한국어
+              </button>
+              <button
+                id="name-language-en"
+                class="name-toggle__button"
+                type="button"
+                aria-pressed="false"
+                lang="en"
+              >
+                English
+              </button>
+            </div>
+            <button
+              id="theme-toggle"
+              class="theme-toggle"
+              type="button"
+              aria-pressed="false"
+            >
+              <span class="theme-toggle__icon" aria-hidden="true">◐</span>
+              <span class="theme-toggle__label" data-i18n="topbar.darkMode"
+                >다크 모드</span
+              >
+            </button>
+          </div>
+        </header>
+
+        <main id="main-content" class="content">
+          <div id="catalog-screen">
+            <!--
+              패널 id 는 네비 해시(#list·#coverage)와 일부러 다르게 둔다.
+              같으면 브라우저의 fragment 스크롤·초점 리셋이 뒤로가기 때마다 앱의
+              스크롤 복원과 초점 이동을 덮어쓴다. 해시 해석은 JS 가 전담한다.
+            -->
+            <section
+              id="list-panel"
+              class="panel"
+              aria-labelledby="catalog-title"
+            >
+              <div class="panel-heading">
+                <h2 id="catalog-title" tabindex="-1" data-i18n="screen.list">
+                  알고리즘 목록
+                </h2>
+                <div class="list-view-controls">
+                  <div
+                    class="view-toggle"
+                    role="group"
+                    data-i18n-aria-label="list.viewGroup"
+                    aria-label="목록 보기 방식"
+                  >
+                    <button
+                      id="view-card"
+                      class="view-toggle__button"
+                      type="button"
+                      aria-pressed="true"
+                      data-i18n="list.viewCard"
+                    >
+                      카드형
+                    </button>
+                    <button
+                      id="view-rows"
+                      class="view-toggle__button"
+                      type="button"
+                      aria-pressed="false"
+                      data-i18n="list.viewRows"
+                    >
+                      리스트형
+                    </button>
+                  </div>
+                  <!-- 항목 수는 카탈로그를 받기 전부터 main.js 가 직접 채운다. -->
+                  <p id="result-count" aria-live="polite">0개 항목</p>
+                </div>
+              </div>
+              <div class="filters">
+                <label>
+                  <span data-i18n="list.searchLabel">카탈로그 검색</span>
+                  <input
+                    id="algorithm-search"
+                    type="search"
+                    data-i18n-placeholder="list.searchPlaceholder"
+                    placeholder="이름, 선택 조건, 분류 또는 언어"
+                    autocomplete="off"
+                  />
+                </label>
+                <label>
+                  <span data-i18n="list.categoryLabel">분류 필터</span>
+                  <select id="category-filter">
+                    <option value="" data-i18n="list.allCategories">
+                      전체 분류
+                    </option>
+                  </select>
+                </label>
+              </div>
+              <div
+                id="algorithm-list"
+                class="algorithm-list"
+                aria-live="polite"
+              ></div>
+            </section>
+
+            <section
+              id="coverage-panel"
+              class="panel"
+              aria-labelledby="coverage-title"
+              hidden
+            >
+              <h2 id="coverage-title" data-i18n="screen.coverage">
+                커버리지 매트릭스
+              </h2>
+              <!-- 범례가 가로 스크롤에 딸려 가지 않도록 표 래퍼는 JS 가 안에 만든다. -->
+              <div id="coverage-matrix"></div>
+            </section>
+
+          </div>
+
+          <!--
+            26차부터 상세는 전 분류가 개요·추상 스펙·구현 세 탭 하나로 통일됐다.
+            섹션 anchor nav 와 별도 코드 비교 패널은 갈 곳이 없어져 걷어냈고,
+            탭·패널 마크업은 main.js 가 이 panel 안에 만든다.
+          -->
+          <section
+            id="detail"
+            class="panel"
+            aria-labelledby="detail-title"
+            hidden
+          >
+            <div class="panel-heading">
+              <h2 id="detail-title" data-i18n="detail.title">
+                설명·계약·테스트
+              </h2>
+              <a
+                class="detail-back"
+                href="#list"
+                data-back-to-list
+                data-i18n="detail.backToList"
+              >
+                ← 목록으로
+              </a>
+            </div>
+            <div id="detail-content"></div>
+          </section>
+
+          <p
+            id="copy-status"
+            class="visually-hidden"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

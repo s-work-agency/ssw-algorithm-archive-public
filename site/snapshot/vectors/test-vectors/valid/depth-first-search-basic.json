@@ -1,0 +1,239 @@
+{
+  "schemaVersion": "1.0",
+  "vectorId": "depth-first-search-basic",
+  "algorithmId": "depth-first-search",
+  "cases": [
+    {
+      "caseId": "visits-preorder-by-edge-order",
+      "input": {
+        "vertices": [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e"
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "b"
+          },
+          {
+            "from": "a",
+            "to": "c"
+          },
+          {
+            "from": "b",
+            "to": "d"
+          },
+          {
+            "from": "c",
+            "to": "d"
+          },
+          {
+            "from": "d",
+            "to": "e"
+          }
+        ],
+        "source": "a"
+      },
+      "expected": {
+        "output": {
+          "order": [
+            "a",
+            "b",
+            "d",
+            "e",
+            "c"
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "rejects-unknown-source",
+      "input": {
+        "vertices": [
+          "a"
+        ],
+        "edges": [],
+        "source": "z"
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_SOURCE"
+        }
+      }
+    },
+    {
+      "caseId": "ignores-disconnected-component",
+      "description": "깊이 우선 탐색도 시작점에서 도달 가능한 컴포넌트만 방문해요.",
+      "input": {
+        "vertices": [
+          "a",
+          "b",
+          "c",
+          "d"
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "b"
+          },
+          {
+            "from": "c",
+            "to": "d"
+          }
+        ],
+        "source": "a"
+      },
+      "expected": {
+        "output": {
+          "order": [
+            "a",
+            "b"
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "rejects-unknown-edge-endpoint",
+      "description": "출발 정점은 유효하고 간선 끝점 하나만 선언 집합 밖인 경우를 거부해요.",
+      "input": {
+        "vertices": [
+          "a"
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "x"
+          }
+        ],
+        "source": "a"
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_EDGE"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-non-array-vertices",
+      "description": "vertices가 배열이 아니면 source나 edges를 보기 전에 INVALID_INPUT이에요.",
+      "input": {
+        "vertices": "ab",
+        "edges": [],
+        "source": "a"
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_INPUT"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-non-string-vertex-id",
+      "description": "vertices 원소가 문자열이 아니면 INVALID_INPUT이에요.",
+      "input": {
+        "vertices": [
+          "a",
+          1
+        ],
+        "edges": [],
+        "source": "a"
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_INPUT"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-duplicate-vertex-ids",
+      "description": "정점 ID가 중복되면 source가 유효해도 INVALID_INPUT이에요.",
+      "input": {
+        "vertices": [
+          "a",
+          "b",
+          "a"
+        ],
+        "edges": [],
+        "source": "a"
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_INPUT"
+        }
+      }
+    },
+    {
+      "caseId": "prefers-invalid-input-over-invalid-source",
+      "description": "중복 정점과 미선언 source를 함께 어기면 vertices 검사가 먼저라 INVALID_INPUT이에요.",
+      "input": {
+        "vertices": [
+          "a",
+          "a"
+        ],
+        "edges": [],
+        "source": "z"
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_INPUT"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-non-array-edges",
+      "description": "edges가 배열이 아니면 INVALID_EDGE예요.",
+      "input": {
+        "vertices": [
+          "a"
+        ],
+        "edges": "x",
+        "source": "a"
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_EDGE"
+        }
+      }
+    },
+    {
+      "caseId": "prefers-invalid-source-over-non-array-edges",
+      "description": "미선언 source와 배열이 아닌 edges를 함께 어기면 source 검사가 먼저라 INVALID_SOURCE예요.",
+      "input": {
+        "vertices": [
+          "a"
+        ],
+        "edges": "x",
+        "source": "z"
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_SOURCE"
+        }
+      }
+    },
+    {
+      "caseId": "prefers-invalid-source-over-undeclared-endpoint",
+      "description": "미선언 source와 미선언 간선 끝점을 함께 어기면 INVALID_SOURCE예요.",
+      "input": {
+        "vertices": [
+          "a"
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "x"
+          }
+        ],
+        "source": "z"
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_SOURCE"
+        }
+      }
+    }
+  ]
+}

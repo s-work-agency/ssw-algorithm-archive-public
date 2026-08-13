@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "2.1",
+  "id": "bubble-sort",
+  "alternatives": [],
+  "documentation": {
+    "whenToUse": [
+      "아주 작은 입력이나 정렬 원리를 설명하는 교육용 구현에 적합해요."
+    ],
+    "avoidWhen": [
+      "입력이 크거나 성능이 중요한 서비스 코드에서는 더 나은 정렬을 선택해요."
+    ],
+    "tradeoffs": [
+      "구현은 쉽고 안정 정렬로 만들 수 있지만 평균과 최악이 O(n²)이에요."
+    ],
+    "pitfalls": [
+      "패스별 비교 범위에서 마지막 원소를 누락하거나 불필요한 교환으로 안정성을 깨지 않도록 주의해요."
+    ]
+  },
+  "contract": {
+    "input": {
+      "values": "array of comparable integers"
+    },
+    "output": {
+      "values": "ascending array containing the input values"
+    },
+    "errors": [],
+    "mutation": "input-must-not-mutate"
+  },
+  "complexity": {
+    "time": "O(n^2) worst case",
+    "space": "O(1) auxiliary"
+  },
+  "preconditions": [
+    "values is not null",
+    "each value is a signed integer"
+  ],
+  "implementations": {
+    "java": {
+      "status": "operational",
+      "entryPoint": "com.ssw.archive.sort.BubbleSort.sort",
+      "source": {
+        "primaryFile": "src/main/java/com/ssw/archive/sort/BubbleSort.java",
+        "files": {
+          "src/main/java/com/ssw/archive/sort/BubbleSort.java": {
+            "id": "source:src/main/java/com/ssw/archive/sort/BubbleSort.java",
+            "path": "src/main/java/com/ssw/archive/sort/BubbleSort.java",
+            "sha256": "bab67ee32ec4f8b8f9731cfa328d8611dd737fc616d36870b533bc14bf6517a6",
+            "byteLength": 1615
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "javascript": {
+      "status": "operational",
+      "entryPoint": "BubbleSort.sort",
+      "source": {
+        "primaryFile": "src/main/javascript/sort/bubble-sort.js",
+        "files": {
+          "src/main/javascript/sort/bubble-sort.js": {
+            "id": "source:src/main/javascript/sort/bubble-sort.js",
+            "path": "src/main/javascript/sort/bubble-sort.js",
+            "sha256": "9072232ddc9871dca877c27500a926ba805dd64ea6cb9c7e957cb80c8f5dc5a1",
+            "byteLength": 1478
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "csharp": {
+      "status": "operational",
+      "entryPoint": "Ssw.Archive.Sort.BubbleSort.Sort",
+      "source": {
+        "primaryFile": "src/main/csharp/Sort/BubbleSort.cs",
+        "files": {
+          "src/main/csharp/Sort/BubbleSort.cs": {
+            "id": "source:src/main/csharp/Sort/BubbleSort.cs",
+            "path": "src/main/csharp/Sort/BubbleSort.cs",
+            "sha256": "6c6c9a4a768a34943b59f27c4cdf831c653cf650c0544b69c32daffcb183b387",
+            "byteLength": 2042
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "typescript": {
+      "status": "reserved",
+      "plannedEntryPoint": "sort",
+      "plannedSourcePath": "src/main/typescript/sort/bubble-sort.ts",
+      "plannedBasicTestPath": "src/test/typescript/sort/bubble-sort.ts"
+    },
+    "python": {
+      "status": "reserved",
+      "plannedEntryPoint": "sort.bubble_sort.sort",
+      "plannedSourcePath": "src/main/python/sort/bubble_sort.py",
+      "plannedBasicTestPath": "src/test/python/sort/bubble_sort.py"
+    },
+    "go": {
+      "status": "reserved",
+      "plannedEntryPoint": "sort.Bubble",
+      "plannedSourcePath": "src/main/go/sort/bubble_sort.go",
+      "plannedBasicTestPath": "src/test/go/sort/bubble_sort.go"
+    },
+    "rust": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw_algorithm_archive::sort::bubble_sort::sort",
+      "plannedSourcePath": "src/main/rust/src/sort/bubble_sort.rs",
+      "plannedBasicTestPath": "src/test/rust/src/sort/bubble_sort.rs"
+    },
+    "kotlin": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw.archive.sort.BubbleSort.sort",
+      "plannedSourcePath": "src/main/kotlin/sort/BubbleSort.kt",
+      "plannedBasicTestPath": "src/test/kotlin/sort/BubbleSort.kt"
+    },
+    "cpp": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw::archive::sorts::bubble",
+      "plannedSourcePath": "src/main/cpp/sort/bubble_sort.cpp",
+      "plannedBasicTestPath": "src/test/cpp/sort/bubble_sort.cpp"
+    },
+    "ruby": {
+      "status": "reserved",
+      "plannedEntryPoint": "SSW::Archive::Sort::BubbleSort.sort",
+      "plannedSourcePath": "src/main/ruby/sort/bubble_sort.rb",
+      "plannedBasicTestPath": "src/test/ruby/sort/bubble_sort.rb"
+    }
+  },
+  "vectors": {
+    "bubble-sort-basic": {
+      "path": "test-vectors/valid/bubble-sort-basic.json",
+      "sha256": "89915a307176b1a12c5414ed2aa0e9c55ebd8a9fda9ccebbdc5b12e1d44824b7",
+      "byteLength": 672,
+      "caseCount": 3
+    }
+  },
+  "assets": {
+    "usage-scenario": {
+      "path": "assets/bubble-sort/usage-scenario.json",
+      "sha256": "60e0f1690426ce952b7f5cb732212caa4dcffd64747e3030e381001bf4b613ad",
+      "byteLength": 3184
+    }
+  }
+}

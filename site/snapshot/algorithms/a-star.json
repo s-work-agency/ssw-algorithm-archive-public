@@ -1,0 +1,216 @@
+{
+  "schemaVersion": "2.1",
+  "id": "a-star",
+  "alternatives": [],
+  "documentation": {
+    "whenToUse": [
+      "목표 하나까지의 경로가 필요하고 허용 가능한 휴리스틱을 만들 수 있을 때 적합해요."
+    ],
+    "avoidWhen": [
+      "음수 가중치가 있거나 휴리스틱이 실제 남은 비용을 과대평가할 수 있으면 피해야 해요."
+    ],
+    "tradeoffs": [
+      "좋은 휴리스틱은 탐색량을 줄이지만 계산 비용과 설계 부담이 생겨요."
+    ],
+    "pitfalls": [
+      "휴리스틱이 과대평가하면 최적 경로 보장이 깨지고 동률 규칙이 다르면 결과 경로도 달라져요."
+    ]
+  },
+  "contract": {
+    "input": {
+      "vertices": "unique vertex IDs",
+      "edges": "directed non-negative weighted edges",
+      "source": "start vertex ID",
+      "target": "goal vertex ID",
+      "heuristic": "non-negative estimate by vertex"
+    },
+    "output": {
+      "path": "source-to-target vertex IDs or empty",
+      "cost": "path cost or null"
+    },
+    "errors": [
+      {
+        "code": "INVALID_INPUT"
+      },
+      {
+        "code": "INVALID_SOURCE"
+      },
+      {
+        "code": "INVALID_TARGET"
+      },
+      {
+        "code": "INVALID_EDGE"
+      },
+      {
+        "code": "NEGATIVE_WEIGHT"
+      },
+      {
+        "code": "INVALID_HEURISTIC"
+      }
+    ],
+    "mutation": "input-must-not-mutate"
+  },
+  "complexity": {
+    "time": "O(V^2 + E)",
+    "space": "O(V + E)"
+  },
+  "preconditions": [
+    "vertices is an array of unique string vertex IDs",
+    "source is a vertex",
+    "target is a vertex",
+    "every edge is an object with string endpoints and a finite number weight",
+    "every edge endpoint is a declared vertex",
+    "all edge weights are non-negative",
+    "heuristic holds a finite non-negative value for every declared vertex",
+    "equal f scores use vertex input order"
+  ],
+  "implementations": {
+    "java": {
+      "status": "operational",
+      "entryPoint": "com.ssw.archive.graph.AStar.execute",
+      "source": {
+        "primaryFile": "src/main/java/com/ssw/archive/graph/AStar.java",
+        "files": {
+          "src/main/java/com/ssw/archive/graph/AStar.java": {
+            "id": "source:src/main/java/com/ssw/archive/graph/AStar.java",
+            "path": "src/main/java/com/ssw/archive/graph/AStar.java",
+            "sha256": "6999bd8af1e2f27131bb82418a2602636438f2983dddf531dae3c59bf1b2f263",
+            "byteLength": 4710
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 18,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "javascript": {
+      "status": "operational",
+      "entryPoint": "AStar.execute",
+      "source": {
+        "primaryFile": "src/main/javascript/graph/a-star.js",
+        "files": {
+          "src/main/javascript/graph/a-star.js": {
+            "id": "source:src/main/javascript/graph/a-star.js",
+            "path": "src/main/javascript/graph/a-star.js",
+            "sha256": "10133d78248cdae7eb1a72d49f656fd59b5a0fb5f80acae5bdd945d9b78b5d18",
+            "byteLength": 4636
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 18,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "csharp": {
+      "status": "operational",
+      "entryPoint": "Ssw.Archive.Graph.AStar.Execute",
+      "source": {
+        "primaryFile": "src/main/csharp/Graph/AStar.cs",
+        "files": {
+          "src/main/csharp/Graph/AStar.cs": {
+            "id": "source:src/main/csharp/Graph/AStar.cs",
+            "path": "src/main/csharp/Graph/AStar.cs",
+            "sha256": "25df401af0e8bfff761aba257458972838fb498348cd50ddfafbcb9c9d65423d",
+            "byteLength": 4939
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 18,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "typescript": {
+      "status": "reserved",
+      "plannedEntryPoint": "execute",
+      "plannedSourcePath": "src/main/typescript/graph/a-star.ts",
+      "plannedBasicTestPath": "src/test/typescript/graph/a-star.ts"
+    },
+    "python": {
+      "status": "reserved",
+      "plannedEntryPoint": "graph.a_star.execute",
+      "plannedSourcePath": "src/main/python/graph/a_star.py",
+      "plannedBasicTestPath": "src/test/python/graph/a_star.py"
+    },
+    "go": {
+      "status": "reserved",
+      "plannedEntryPoint": "graph.ExecuteAStar",
+      "plannedSourcePath": "src/main/go/graph/a_star.go",
+      "plannedBasicTestPath": "src/test/go/graph/a_star.go"
+    },
+    "rust": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw_algorithm_archive::graph::a_star::execute",
+      "plannedSourcePath": "src/main/rust/src/graph/a_star.rs",
+      "plannedBasicTestPath": "src/test/rust/src/graph/a_star.rs"
+    },
+    "kotlin": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw.archive.graph.AStar.execute",
+      "plannedSourcePath": "src/main/kotlin/graph/AStar.kt",
+      "plannedBasicTestPath": "src/test/kotlin/graph/AStar.kt"
+    },
+    "cpp": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw::archive::graph::AStar::execute",
+      "plannedSourcePath": "src/main/cpp/graph/a_star.hpp",
+      "plannedBasicTestPath": "src/test/cpp/graph/a_star.hpp"
+    },
+    "ruby": {
+      "status": "reserved",
+      "plannedEntryPoint": "SSW::Archive::Graph::AStar.execute",
+      "plannedSourcePath": "src/main/ruby/graph/a_star.rb",
+      "plannedBasicTestPath": "src/test/ruby/graph/a_star.rb"
+    }
+  },
+  "vectors": {
+    "a-star-basic": {
+      "path": "test-vectors/valid/a-star-basic.json",
+      "sha256": "f53093f08d67fc8d62f4121bd3637b3f44373288678256001ba38cead09d638b",
+      "byteLength": 10643,
+      "caseCount": 18
+    }
+  },
+  "assets": {
+    "usage-scenario": {
+      "path": "assets/a-star/usage-scenario.json",
+      "sha256": "be3a934b8cf065f3373ff716e6c7be3116fb4bf9f8d803584d846460353404e9",
+      "byteLength": 3729
+    }
+  }
+}

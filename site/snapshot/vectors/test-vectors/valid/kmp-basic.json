@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0",
+  "vectorId": "kmp-basic",
+  "algorithmId": "kmp",
+  "cases": [
+    {
+      "caseId": "finds-overlapping-patterns",
+      "input": {
+        "text": "ababaabababa",
+        "pattern": "aba"
+      },
+      "expected": {
+        "output": {
+          "indices": [
+            0,
+            2,
+            5,
+            7,
+            9
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "returns-empty-when-pattern-is-absent",
+      "description": "일치가 하나도 없으면 빈 인덱스 배열을 반환해요.",
+      "input": {
+        "text": "abcabc",
+        "pattern": "d"
+      },
+      "expected": {
+        "output": {
+          "indices": []
+        }
+      }
+    },
+    {
+      "caseId": "rejects-empty-pattern",
+      "description": "빈 패턴의 의미를 임의로 정하지 않고 계약의 EMPTY_PATTERN 오류를 반환해요.",
+      "input": {
+        "text": "abc",
+        "pattern": ""
+      },
+      "expected": {
+        "error": {
+          "code": "EMPTY_PATTERN"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-non-bmp-pattern",
+      "description": "비어 있지 않지만 BMP 밖의 코드 포인트를 포함한 패턴을 거부해요.",
+      "input": {
+        "text": "abc",
+        "pattern": "🙂"
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_INPUT"
+        }
+      }
+    }
+  ]
+}

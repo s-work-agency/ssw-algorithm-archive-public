@@ -1,0 +1,21 @@
+{
+  "name": "ssw-algorithm-archive-public-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.5",
+  "description": "Static public snapshot of the SSW Algorithm Archive catalog.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "clean": "node scripts/clean.mjs",
+    "build": "pnpm run clean && pnpm run lint && tsc --project tsconfig.json && node scripts/copy-static.mjs",
+    "test": "pnpm run build && node --test tests/navigation.test.mjs",
+    "lint": "tsc --project tsconfig.json --noEmit",
+    "snapshot": "node scripts/build-snapshot.mjs"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.3"
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "schemaVersion": "1.0",
+  "vectorId": "aho-corasick-wave-3",
+  "algorithmId": "aho-corasick",
+  "cases": [
+    {
+      "caseId": "finds-overlapping-patterns",
+      "input": {
+        "text": "ushers",
+        "patterns": [
+          {
+            "id": "he",
+            "pattern": "he"
+          },
+          {
+            "id": "she",
+            "pattern": "she"
+          },
+          {
+            "id": "his",
+            "pattern": "his"
+          },
+          {
+            "id": "hers",
+            "pattern": "hers"
+          }
+        ]
+      },
+      "expected": {
+        "output": {
+          "matches": [
+            {
+              "patternId": "she",
+              "start": 1,
+              "end": 4
+            },
+            {
+              "patternId": "he",
+              "start": 2,
+              "end": 4
+            },
+            {
+              "patternId": "hers",
+              "start": 2,
+              "end": 6
+            }
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "orders-dense-overlaps",
+      "input": {
+        "text": "aaa",
+        "patterns": [
+          {
+            "id": "a",
+            "pattern": "a"
+          },
+          {
+            "id": "aa",
+            "pattern": "aa"
+          }
+        ]
+      },
+      "expected": {
+        "output": {
+          "matches": [
+            {
+              "patternId": "a",
+              "start": 0,
+              "end": 1
+            },
+            {
+              "patternId": "aa",
+              "start": 0,
+              "end": 2
+            },
+            {
+              "patternId": "a",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "patternId": "aa",
+              "start": 1,
+              "end": 3
+            },
+            {
+              "patternId": "a",
+              "start": 2,
+              "end": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "handles-empty-pattern-set",
+      "input": {
+        "text": "",
+        "patterns": []
+      },
+      "expected": {
+        "output": {
+          "matches": []
+        }
+      }
+    },
+    {
+      "caseId": "rejects-duplicate-pattern-id",
+      "input": {
+        "text": "abc",
+        "patterns": [
+          {
+            "id": "p",
+            "pattern": "a"
+          },
+          {
+            "id": "p",
+            "pattern": "b"
+          }
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": "DUPLICATE_PATTERN_ID"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-non-ascii-text",
+      "input": {
+        "text": "한",
+        "patterns": [
+          {
+            "id": "p",
+            "pattern": "a"
+          }
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_TEXT"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-empty-pattern",
+      "description": "텍스트와 패턴 ID는 유효하지만 패턴 값만 빈 문자열인 경우를 거부해요.",
+      "input": {
+        "text": "",
+        "patterns": [
+          {
+            "id": "p",
+            "pattern": ""
+          }
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_PATTERN"
+        }
+      }
+    }
+  ]
+}

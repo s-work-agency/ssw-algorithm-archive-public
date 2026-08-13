@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "2.1",
+  "id": "kmp",
+  "alternatives": [],
+  "documentation": {
+    "whenToUse": [
+      "긴 텍스트에서 반복 문자가 많은 패턴도 선형 시간에 찾고 싶을 때 적합해요."
+    ],
+    "avoidWhen": [
+      "작은 입력에서 한 번만 찾는다면 단순 검색이 더 읽기 쉬울 수 있어요."
+    ],
+    "tradeoffs": [
+      "O(n+m)을 보장하지만 실패 함수 배열을 만들고 이해하는 비용이 들어요."
+    ],
+    "pitfalls": [
+      "빈 패턴의 의미와 유니코드 인덱스 단위를 계약하지 않으면 언어별 위치가 달라져요."
+    ]
+  },
+  "contract": {
+    "input": {
+      "text": "BMP-only string to search",
+      "pattern": "non-empty BMP-only string pattern"
+    },
+    "output": {
+      "indices": "all match start indices including overlaps"
+    },
+    "errors": [
+      {
+        "code": "INVALID_INPUT"
+      },
+      {
+        "code": "EMPTY_PATTERN"
+      }
+    ],
+    "mutation": "input-must-not-mutate"
+  },
+  "complexity": {
+    "time": "O(text.length + pattern.length)",
+    "space": "O(pattern.length)"
+  },
+  "preconditions": [
+    "pattern is non-empty",
+    "text and pattern contain only Basic Multilingual Plane characters",
+    "indices use zero-based character offsets consistently across active adapters"
+  ],
+  "implementations": {
+    "java": {
+      "status": "operational",
+      "entryPoint": "com.ssw.archive.stringalgorithms.Kmp.execute",
+      "source": {
+        "primaryFile": "src/main/java/com/ssw/archive/stringalgorithms/Kmp.java",
+        "files": {
+          "src/main/java/com/ssw/archive/stringalgorithms/Kmp.java": {
+            "id": "source:src/main/java/com/ssw/archive/stringalgorithms/Kmp.java",
+            "path": "src/main/java/com/ssw/archive/stringalgorithms/Kmp.java",
+            "sha256": "69165a541178ef5e94dd16b4c416c4d5dba874e02d64b3179a7f920c2ad1fa90",
+            "byteLength": 2837
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "javascript": {
+      "status": "operational",
+      "entryPoint": "Kmp.execute",
+      "source": {
+        "primaryFile": "src/main/javascript/string/kmp.js",
+        "files": {
+          "src/main/javascript/string/kmp.js": {
+            "id": "source:src/main/javascript/string/kmp.js",
+            "path": "src/main/javascript/string/kmp.js",
+            "sha256": "402a716deb1ab8383bb1bfe428fcbb885ba32069f5b7700ec449fdff43e975a8",
+            "byteLength": 2105
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "csharp": {
+      "status": "operational",
+      "entryPoint": "Ssw.Archive.StringAlgorithms.Kmp.Execute",
+      "source": {
+        "primaryFile": "src/main/csharp/String/Kmp.cs",
+        "files": {
+          "src/main/csharp/String/Kmp.cs": {
+            "id": "source:src/main/csharp/String/Kmp.cs",
+            "path": "src/main/csharp/String/Kmp.cs",
+            "sha256": "50986e269b049cbd1a65d520c049bec0c63e6e372cb15e5379663455352f238f",
+            "byteLength": 2328
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "typescript": {
+      "status": "reserved",
+      "plannedEntryPoint": "execute",
+      "plannedSourcePath": "src/main/typescript/string/kmp.ts",
+      "plannedBasicTestPath": "src/test/typescript/string/kmp.ts"
+    },
+    "python": {
+      "status": "reserved",
+      "plannedEntryPoint": "string_algorithms.kmp.execute",
+      "plannedSourcePath": "src/main/python/string_algorithms/kmp.py",
+      "plannedBasicTestPath": "src/test/python/string_algorithms/kmp.py"
+    },
+    "go": {
+      "status": "reserved",
+      "plannedEntryPoint": "string.ExecuteKmp",
+      "plannedSourcePath": "src/main/go/string/kmp.go",
+      "plannedBasicTestPath": "src/test/go/string/kmp.go"
+    },
+    "rust": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw_algorithm_archive::string::kmp::execute",
+      "plannedSourcePath": "src/main/rust/src/string/kmp.rs",
+      "plannedBasicTestPath": "src/test/rust/src/string/kmp.rs"
+    },
+    "kotlin": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw.archive.string.Kmp.execute",
+      "plannedSourcePath": "src/main/kotlin/string/Kmp.kt",
+      "plannedBasicTestPath": "src/test/kotlin/string/Kmp.kt"
+    },
+    "cpp": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw::archive::string::Kmp::execute",
+      "plannedSourcePath": "src/main/cpp/string/kmp.hpp",
+      "plannedBasicTestPath": "src/test/cpp/string/kmp.hpp"
+    },
+    "ruby": {
+      "status": "reserved",
+      "plannedEntryPoint": "SSW::Archive::String::Kmp.execute",
+      "plannedSourcePath": "src/main/ruby/string/kmp.rb",
+      "plannedBasicTestPath": "src/test/ruby/string/kmp.rb"
+    }
+  },
+  "vectors": {
+    "kmp-basic": {
+      "path": "test-vectors/valid/kmp-basic.json",
+      "sha256": "114ad30c22bcda5a8f8956e00b0b9d6446bc97b85ca73dab3966a50977320ec0",
+      "byteLength": 1462,
+      "caseCount": 4
+    }
+  },
+  "assets": {
+    "usage-scenario": {
+      "path": "assets/kmp/usage-scenario.json",
+      "sha256": "70a496f3190abb8d1c42cb2653e2d2f5780134abc8a0cfb8307641629f7226e4",
+      "byteLength": 2972
+    }
+  }
+}

@@ -1,0 +1,10 @@
+# 배포 산출물과 스냅샷 입력은 catalog가 발표한 sha256으로 브라우저가 다시 확인하는
+# 바이트입니다. 줄바꿈 변환이 한 번이라도 걸리면 그 자리에서 무결성 검사가 실패하므로,
+# 이 트리는 어떤 정규화도 거치지 않습니다.
+site/snapshot/** -text
+/algorithms/** -text
+/assets/** -text
+/sources/** -text
+/vectors/** -text
+/catalog-index.json -text
+/catalog-search.json -text

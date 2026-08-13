@@ -1,0 +1,203 @@
+{
+  "schemaVersion": "2.1",
+  "id": "breadth-first-search",
+  "alternatives": [
+    "depth-first-search"
+  ],
+  "documentation": {
+    "whenToUse": [
+      "모든 간선 비용이 같고 시작점에서 최소 단계 경로를 찾을 때 적합해요."
+    ],
+    "avoidWhen": [
+      "간선 가중치가 서로 다르면 가중 최단 경로 알고리즘을 사용해요."
+    ],
+    "tradeoffs": [
+      "최소 단계를 보장하지만 넓은 레벨의 정점을 큐에 모두 보관할 수 있어요."
+    ],
+    "pitfalls": [
+      "큐에 넣을 때 방문 표시를 하지 않으면 중복 삽입되고 이웃 순서에 따라 결과도 달라져요."
+    ]
+  },
+  "contract": {
+    "input": {
+      "vertices": "unique vertex IDs",
+      "edges": "ordered directed edges",
+      "source": "start vertex ID"
+    },
+    "output": {
+      "order": "visit order using outgoing edge input order"
+    },
+    "errors": [
+      {
+        "code": "INVALID_INPUT"
+      },
+      {
+        "code": "INVALID_SOURCE"
+      },
+      {
+        "code": "INVALID_EDGE"
+      }
+    ],
+    "mutation": "input-must-not-mutate"
+  },
+  "complexity": {
+    "time": "O(V + E)",
+    "space": "O(V)"
+  },
+  "preconditions": [
+    "vertices is an array of unique string vertex IDs",
+    "source is a vertex",
+    "every edge is an object with string endpoints",
+    "every edge endpoint is a declared vertex",
+    "outgoing neighbors follow edge input order"
+  ],
+  "implementations": {
+    "java": {
+      "status": "operational",
+      "entryPoint": "com.ssw.archive.graph.BreadthFirstSearch.execute",
+      "source": {
+        "primaryFile": "src/main/java/com/ssw/archive/graph/BreadthFirstSearch.java",
+        "files": {
+          "src/main/java/com/ssw/archive/graph/BreadthFirstSearch.java": {
+            "id": "source:src/main/java/com/ssw/archive/graph/BreadthFirstSearch.java",
+            "path": "src/main/java/com/ssw/archive/graph/BreadthFirstSearch.java",
+            "sha256": "55ad8ab437184df858211708699a5fae8c788abf93a28f1294f7cff8dec11802",
+            "byteLength": 2837
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "javascript": {
+      "status": "operational",
+      "entryPoint": "BreadthFirstSearch.execute",
+      "source": {
+        "primaryFile": "src/main/javascript/graph/breadth-first-search.js",
+        "files": {
+          "src/main/javascript/graph/breadth-first-search.js": {
+            "id": "source:src/main/javascript/graph/breadth-first-search.js",
+            "path": "src/main/javascript/graph/breadth-first-search.js",
+            "sha256": "44659e074fe482a9a7d07ec77f050ed7bf1432251fac28463a07e13afc7c77d0",
+            "byteLength": 2682
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "csharp": {
+      "status": "operational",
+      "entryPoint": "Ssw.Archive.Graph.BreadthFirstSearch.Execute",
+      "source": {
+        "primaryFile": "src/main/csharp/Graph/BreadthFirstSearch.cs",
+        "files": {
+          "src/main/csharp/Graph/BreadthFirstSearch.cs": {
+            "id": "source:src/main/csharp/Graph/BreadthFirstSearch.cs",
+            "path": "src/main/csharp/Graph/BreadthFirstSearch.cs",
+            "sha256": "1223cbb351b6a576984768d72318d57c7f26124f944d451b4f9413bdeb262334",
+            "byteLength": 2794
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "typescript": {
+      "status": "reserved",
+      "plannedEntryPoint": "execute",
+      "plannedSourcePath": "src/main/typescript/graph/breadth-first-search.ts",
+      "plannedBasicTestPath": "src/test/typescript/graph/breadth-first-search.ts"
+    },
+    "python": {
+      "status": "reserved",
+      "plannedEntryPoint": "graph.breadth_first_search.execute",
+      "plannedSourcePath": "src/main/python/graph/breadth_first_search.py",
+      "plannedBasicTestPath": "src/test/python/graph/breadth_first_search.py"
+    },
+    "go": {
+      "status": "reserved",
+      "plannedEntryPoint": "graph.ExecuteBreadthFirstSearch",
+      "plannedSourcePath": "src/main/go/graph/breadth_first_search.go",
+      "plannedBasicTestPath": "src/test/go/graph/breadth_first_search.go"
+    },
+    "rust": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw_algorithm_archive::graph::breadth_first_search::execute",
+      "plannedSourcePath": "src/main/rust/src/graph/breadth_first_search.rs",
+      "plannedBasicTestPath": "src/test/rust/src/graph/breadth_first_search.rs"
+    },
+    "kotlin": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw.archive.graph.BreadthFirstSearch.execute",
+      "plannedSourcePath": "src/main/kotlin/graph/BreadthFirstSearch.kt",
+      "plannedBasicTestPath": "src/test/kotlin/graph/BreadthFirstSearch.kt"
+    },
+    "cpp": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw::archive::graph::BreadthFirstSearch::execute",
+      "plannedSourcePath": "src/main/cpp/graph/breadth_first_search.hpp",
+      "plannedBasicTestPath": "src/test/cpp/graph/breadth_first_search.hpp"
+    },
+    "ruby": {
+      "status": "reserved",
+      "plannedEntryPoint": "SSW::Archive::Graph::BreadthFirstSearch.execute",
+      "plannedSourcePath": "src/main/ruby/graph/breadth_first_search.rb",
+      "plannedBasicTestPath": "src/test/ruby/graph/breadth_first_search.rb"
+    }
+  },
+  "vectors": {
+    "breadth-first-search-basic": {
+      "path": "test-vectors/valid/breadth-first-search-basic.json",
+      "sha256": "97ca4ccfc004d92a1fbababf50857877e22bc3da471e3e650374d993ef53435c",
+      "byteLength": 5293,
+      "caseCount": 11
+    }
+  },
+  "assets": {
+    "usage-scenario": {
+      "path": "assets/breadth-first-search/usage-scenario.json",
+      "sha256": "89fbe6618e34de03ea9e3a7587605baf32d4ac3153af69b7580f1946e21e4e34",
+      "byteLength": 2766
+    }
+  }
+}

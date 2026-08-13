@@ -1,0 +1,476 @@
+{
+  "schemaVersion": "1.0",
+  "vectorId": "a-star-basic",
+  "algorithmId": "a-star",
+  "cases": [
+    {
+      "caseId": "finds-path-with-injected-heuristic",
+      "input": {
+        "vertices": [
+          "a",
+          "b",
+          "c",
+          "d"
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "b",
+            "weight": 1
+          },
+          {
+            "from": "a",
+            "to": "c",
+            "weight": 4
+          },
+          {
+            "from": "b",
+            "to": "c",
+            "weight": 2
+          },
+          {
+            "from": "b",
+            "to": "d",
+            "weight": 5
+          },
+          {
+            "from": "c",
+            "to": "d",
+            "weight": 1
+          }
+        ],
+        "source": "a",
+        "target": "d",
+        "heuristic": {
+          "a": 4,
+          "b": 2,
+          "c": 1,
+          "d": 0
+        }
+      },
+      "expected": {
+        "output": {
+          "path": [
+            "a",
+            "b",
+            "c",
+            "d"
+          ],
+          "cost": 4
+        }
+      }
+    },
+    {
+      "caseId": "returns-empty-path-when-unreachable",
+      "input": {
+        "vertices": [
+          "a",
+          "b",
+          "c",
+          "d"
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "b",
+            "weight": 1
+          },
+          {
+            "from": "b",
+            "to": "c",
+            "weight": 1
+          }
+        ],
+        "source": "d",
+        "target": "a",
+        "heuristic": {
+          "a": 0,
+          "b": 0,
+          "c": 0,
+          "d": 0
+        }
+      },
+      "expected": {
+        "output": {
+          "path": [],
+          "cost": null
+        }
+      }
+    },
+    {
+      "caseId": "rejects-missing-heuristic-entry",
+      "description": "모든 정점의 휴리스틱이 필요하다는 계약을 검증해요.",
+      "input": {
+        "vertices": [
+          "a",
+          "b"
+        ],
+        "edges": [],
+        "source": "a",
+        "target": "b",
+        "heuristic": {
+          "a": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_HEURISTIC"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-unknown-source",
+      "description": "출발 정점만 선언 집합에 없을 때 INVALID_SOURCE로 분리해요.",
+      "input": {
+        "vertices": [
+          "a"
+        ],
+        "edges": [],
+        "source": "x",
+        "target": "a",
+        "heuristic": {
+          "a": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_SOURCE"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-unknown-target",
+      "description": "도착 정점만 선언 집합에 없을 때 INVALID_TARGET으로 분리해요.",
+      "input": {
+        "vertices": [
+          "a"
+        ],
+        "edges": [],
+        "source": "a",
+        "target": "x",
+        "heuristic": {
+          "a": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_TARGET"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-unknown-edge-endpoint",
+      "description": "가중치는 유효하지만 간선 끝점 하나가 선언되지 않은 경우를 거부해요.",
+      "input": {
+        "vertices": [
+          "a",
+          "b"
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "x",
+            "weight": 1
+          }
+        ],
+        "source": "a",
+        "target": "b",
+        "heuristic": {
+          "a": 0,
+          "b": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_EDGE"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-negative-edge-weight",
+      "description": "선언된 두 정점 사이의 음수 가중치만 단독으로 위반해요.",
+      "input": {
+        "vertices": [
+          "a",
+          "b"
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "b",
+            "weight": -1
+          }
+        ],
+        "source": "a",
+        "target": "b",
+        "heuristic": {
+          "a": 0,
+          "b": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "NEGATIVE_WEIGHT"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-non-array-vertices",
+      "description": "vertices가 배열이 아니면 source나 edges를 보기 전에 INVALID_INPUT이에요.",
+      "input": {
+        "vertices": "ab",
+        "edges": [],
+        "source": "a",
+        "target": "a",
+        "heuristic": {
+          "a": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_INPUT"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-non-string-vertex-id",
+      "description": "vertices 원소가 문자열이 아니면 INVALID_INPUT이에요.",
+      "input": {
+        "vertices": [
+          "a",
+          1
+        ],
+        "edges": [],
+        "source": "a",
+        "target": "a",
+        "heuristic": {
+          "a": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_INPUT"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-duplicate-vertex-ids",
+      "description": "정점 ID가 중복되면 source·target이 유효해도 INVALID_INPUT이에요.",
+      "input": {
+        "vertices": [
+          "a",
+          "b",
+          "a"
+        ],
+        "edges": [],
+        "source": "a",
+        "target": "b",
+        "heuristic": {
+          "a": 0,
+          "b": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_INPUT"
+        }
+      }
+    },
+    {
+      "caseId": "prefers-invalid-input-over-invalid-source",
+      "description": "중복 정점과 미선언 source를 함께 어기면 vertices 검사가 먼저라 INVALID_INPUT이에요.",
+      "input": {
+        "vertices": [
+          "a",
+          "a"
+        ],
+        "edges": [],
+        "source": "z",
+        "target": "a",
+        "heuristic": {
+          "a": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_INPUT"
+        }
+      }
+    },
+    {
+      "caseId": "rejects-non-array-edges",
+      "description": "edges가 배열이 아니면 INVALID_EDGE예요.",
+      "input": {
+        "vertices": [
+          "a"
+        ],
+        "edges": "x",
+        "source": "a",
+        "target": "a",
+        "heuristic": {
+          "a": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_EDGE"
+        }
+      }
+    },
+    {
+      "caseId": "prefers-invalid-source-over-non-array-edges",
+      "description": "미선언 source와 배열이 아닌 edges를 함께 어기면 source 검사가 먼저라 INVALID_SOURCE예요.",
+      "input": {
+        "vertices": [
+          "a"
+        ],
+        "edges": "x",
+        "source": "z",
+        "target": "a",
+        "heuristic": {
+          "a": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_SOURCE"
+        }
+      }
+    },
+    {
+      "caseId": "prefers-invalid-target-over-non-array-edges",
+      "description": "미선언 target과 배열이 아닌 edges를 함께 어기면 target 검사가 먼저라 INVALID_TARGET이에요.",
+      "input": {
+        "vertices": [
+          "a"
+        ],
+        "edges": "x",
+        "source": "a",
+        "target": "y",
+        "heuristic": {
+          "a": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_TARGET"
+        }
+      }
+    },
+    {
+      "caseId": "prefers-invalid-edge-over-negative-weight",
+      "description": "같은 간선이 미선언 끝점과 음수 가중치를 함께 어기면 끝점 검사가 먼저라 INVALID_EDGE예요.",
+      "input": {
+        "vertices": [
+          "a",
+          "b"
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "x",
+            "weight": -1
+          }
+        ],
+        "source": "a",
+        "target": "b",
+        "heuristic": {
+          "a": 0,
+          "b": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_EDGE"
+        }
+      }
+    },
+    {
+      "caseId": "prefers-invalid-edge-over-invalid-heuristic",
+      "description": "간선 위반과 휴리스틱 누락을 함께 어기면 간선 검사가 먼저라 INVALID_EDGE예요.",
+      "input": {
+        "vertices": [
+          "a",
+          "b"
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "x",
+            "weight": 1
+          }
+        ],
+        "source": "a",
+        "target": "b",
+        "heuristic": {
+          "a": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "INVALID_EDGE"
+        }
+      }
+    },
+    {
+      "caseId": "prefers-negative-weight-over-invalid-heuristic",
+      "description": "음수 가중치와 휴리스틱 누락을 함께 어기면 간선 검사가 먼저라 NEGATIVE_WEIGHT예요.",
+      "input": {
+        "vertices": [
+          "a",
+          "b"
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "b",
+            "weight": -1
+          }
+        ],
+        "source": "a",
+        "target": "b",
+        "heuristic": {
+          "a": 0
+        }
+      },
+      "expected": {
+        "error": {
+          "code": "NEGATIVE_WEIGHT"
+        }
+      }
+    },
+    {
+      "caseId": "ignores-heuristic-entries-for-undeclared-vertices",
+      "description": "선언된 모든 정점의 값이 있으면 선언되지 않은 정점의 여분 휴리스틱 항목은 무시해요.",
+      "input": {
+        "vertices": [
+          "a",
+          "b"
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "b",
+            "weight": 1
+          }
+        ],
+        "source": "a",
+        "target": "b",
+        "heuristic": {
+          "a": 0,
+          "b": 0,
+          "z": 0
+        }
+      },
+      "expected": {
+        "output": {
+          "path": [
+            "a",
+            "b"
+          ],
+          "cost": 1
+        }
+      }
+    }
+  ]
+}

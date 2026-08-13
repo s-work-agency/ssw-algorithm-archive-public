@@ -1,0 +1,192 @@
+{
+  "schemaVersion": "2.1",
+  "id": "quick-sort",
+  "alternatives": [],
+  "documentation": {
+    "whenToUse": [
+      "평균적으로 빠른 제자리 정렬이 필요하고 안정 정렬이 필수가 아닐 때 적합해요."
+    ],
+    "avoidWhen": [
+      "최악 시간 보장이나 동일 키의 원래 순서가 필요하면 다른 정렬을 선택해요."
+    ],
+    "tradeoffs": [
+      "평균 O(n log n)이지만 나쁜 피벗에서는 O(n²)까지 느려져요."
+    ],
+    "pitfalls": [
+      "중복 값이 많은 입력의 분할 정지 조건과 이미 정렬된 입력의 피벗 선택을 주의해야 해요."
+    ]
+  },
+  "contract": {
+    "input": {
+      "values": "array of signed 32-bit integers (each in -2147483648 through 2147483647)"
+    },
+    "output": {
+      "values": "ascending input values"
+    },
+    "errors": [
+      {
+        "code": "INVALID_INTEGER"
+      }
+    ],
+    "mutation": "input-must-not-mutate"
+  },
+  "complexity": {
+    "time": "O(n^2) worst case",
+    "space": "O(log n) stack"
+  },
+  "preconditions": [
+    "values is an array of signed 32-bit integers",
+    "non-array values or a non-integer or out-of-range element raises INVALID_INTEGER",
+    "equal values form a single group so the result is ascending with duplicates preserved",
+    "partitioning descends into the smaller side first so stack depth stays logarithmic"
+  ],
+  "implementations": {
+    "java": {
+      "status": "operational",
+      "entryPoint": "com.ssw.archive.sort.QuickSort.sort",
+      "source": {
+        "primaryFile": "src/main/java/com/ssw/archive/sort/QuickSort.java",
+        "files": {
+          "src/main/java/com/ssw/archive/sort/QuickSort.java": {
+            "id": "source:src/main/java/com/ssw/archive/sort/QuickSort.java",
+            "path": "src/main/java/com/ssw/archive/sort/QuickSort.java",
+            "sha256": "fea9830624e22589c8325fd144fe4ddfe1761c6b2bf5d0d8a99106193805db54",
+            "byteLength": 2527
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "javascript": {
+      "status": "operational",
+      "entryPoint": "QuickSort.sort",
+      "source": {
+        "primaryFile": "src/main/javascript/sort/quick-sort.js",
+        "files": {
+          "src/main/javascript/sort/quick-sort.js": {
+            "id": "source:src/main/javascript/sort/quick-sort.js",
+            "path": "src/main/javascript/sort/quick-sort.js",
+            "sha256": "3b1ad4afe299693a255196fb9766866e5ee1cb525d60ab262d59b2f81952e8cf",
+            "byteLength": 2870
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "csharp": {
+      "status": "operational",
+      "entryPoint": "Ssw.Archive.Sort.QuickSort.Sort",
+      "source": {
+        "primaryFile": "src/main/csharp/Sort/QuickSort.cs",
+        "files": {
+          "src/main/csharp/Sort/QuickSort.cs": {
+            "id": "source:src/main/csharp/Sort/QuickSort.cs",
+            "path": "src/main/csharp/Sort/QuickSort.cs",
+            "sha256": "d574e7c53f3e44c59124d5c466397444d703549b28655a4510b333ad1d533fa2",
+            "byteLength": 3441
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "typescript": {
+      "status": "reserved",
+      "plannedEntryPoint": "sort",
+      "plannedSourcePath": "src/main/typescript/sort/quick-sort.ts",
+      "plannedBasicTestPath": "src/test/typescript/sort/quick-sort.ts"
+    },
+    "python": {
+      "status": "reserved",
+      "plannedEntryPoint": "sort.quick_sort.sort",
+      "plannedSourcePath": "src/main/python/sort/quick_sort.py",
+      "plannedBasicTestPath": "src/test/python/sort/quick_sort.py"
+    },
+    "go": {
+      "status": "reserved",
+      "plannedEntryPoint": "sort.Quick",
+      "plannedSourcePath": "src/main/go/sort/quick_sort.go",
+      "plannedBasicTestPath": "src/test/go/sort/quick_sort.go"
+    },
+    "rust": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw_algorithm_archive::sort::quick_sort::sort",
+      "plannedSourcePath": "src/main/rust/src/sort/quick_sort.rs",
+      "plannedBasicTestPath": "src/test/rust/src/sort/quick_sort.rs"
+    },
+    "kotlin": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw.archive.sort.QuickSort.sort",
+      "plannedSourcePath": "src/main/kotlin/sort/QuickSort.kt",
+      "plannedBasicTestPath": "src/test/kotlin/sort/QuickSort.kt"
+    },
+    "cpp": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw::archive::sorts::quick",
+      "plannedSourcePath": "src/main/cpp/sort/quick_sort.cpp",
+      "plannedBasicTestPath": "src/test/cpp/sort/quick_sort.cpp"
+    },
+    "ruby": {
+      "status": "reserved",
+      "plannedEntryPoint": "SSW::Archive::Sort::QuickSort.sort",
+      "plannedSourcePath": "src/main/ruby/sort/quick_sort.rb",
+      "plannedBasicTestPath": "src/test/ruby/sort/quick_sort.rb"
+    }
+  },
+  "vectors": {
+    "quick-sort-basic": {
+      "path": "test-vectors/valid/quick-sort-basic.json",
+      "sha256": "db69f0cce8892bf07cd1f5502a8250c861bbac338e41c9bed94999a4869f51aa",
+      "byteLength": 157049,
+      "caseCount": 9
+    }
+  },
+  "assets": {
+    "usage-scenario": {
+      "path": "assets/quick-sort/usage-scenario.json",
+      "sha256": "15ad656d6009e2040bb6bd53194f82c105fee4b6e5eb61fb13fe73f22d7d45e4",
+      "byteLength": 3420
+    }
+  }
+}

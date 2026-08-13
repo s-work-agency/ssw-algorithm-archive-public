@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "2.1",
+  "id": "counting-sort",
+  "alternatives": [],
+  "documentation": {
+    "whenToUse": [
+      "정수 값의 범위가 입력 크기에 비해 작고 명확할 때 적합해요."
+    ],
+    "avoidWhen": [
+      "최솟값과 최댓값 차이가 매우 크면 피해야 해요."
+    ],
+    "tradeoffs": [
+      "O(n+k)로 빠르지만 값 범위 k만큼 추가 메모리를 사용해요."
+    ],
+    "pitfalls": [
+      "음수 오프셋과 범위 계산 오버플로를 놓치면 잘못된 인덱스나 과도한 할당이 생겨요."
+    ]
+  },
+  "contract": {
+    "input": {
+      "values": "array of signed 32-bit integers whose value span max - min + 1 is at most 1000000"
+    },
+    "output": {
+      "values": "ascending input values"
+    },
+    "errors": [
+      {
+        "code": "INVALID_INTEGER"
+      },
+      {
+        "code": "INPUT_TOO_LARGE"
+      }
+    ],
+    "mutation": "input-must-not-mutate"
+  },
+  "complexity": {
+    "time": "O(n + k)",
+    "space": "O(n + k)"
+  },
+  "preconditions": [
+    "values is an array of signed 32-bit integers",
+    "non-array values or a non-integer or out-of-range element raises INVALID_INTEGER",
+    "the counting span max - min + 1 is at most 1000000 and a wider span raises INPUT_TOO_LARGE",
+    "empty values returns an empty array"
+  ],
+  "implementations": {
+    "java": {
+      "status": "operational",
+      "entryPoint": "com.ssw.archive.sort.CountingSort.sort",
+      "source": {
+        "primaryFile": "src/main/java/com/ssw/archive/sort/CountingSort.java",
+        "files": {
+          "src/main/java/com/ssw/archive/sort/CountingSort.java": {
+            "id": "source:src/main/java/com/ssw/archive/sort/CountingSort.java",
+            "path": "src/main/java/com/ssw/archive/sort/CountingSort.java",
+            "sha256": "d730eabb187194a61d2f928ab4264e6d1f8494c11b235454ac32ccfc1a8c02d0",
+            "byteLength": 1986
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "javascript": {
+      "status": "operational",
+      "entryPoint": "CountingSort.sort",
+      "source": {
+        "primaryFile": "src/main/javascript/sort/counting-sort.js",
+        "files": {
+          "src/main/javascript/sort/counting-sort.js": {
+            "id": "source:src/main/javascript/sort/counting-sort.js",
+            "path": "src/main/javascript/sort/counting-sort.js",
+            "sha256": "2f10a88876f2de525ed89f6e5c1acb30d7bddfe6409b75fae6ba72ed146c792d",
+            "byteLength": 1751
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "csharp": {
+      "status": "operational",
+      "entryPoint": "Ssw.Archive.Sort.CountingSort.Sort",
+      "source": {
+        "primaryFile": "src/main/csharp/Sort/CountingSort.cs",
+        "files": {
+          "src/main/csharp/Sort/CountingSort.cs": {
+            "id": "source:src/main/csharp/Sort/CountingSort.cs",
+            "path": "src/main/csharp/Sort/CountingSort.cs",
+            "sha256": "6cee468863706ab50ba4c157a5ad7fc3a89664547a23acdbb4d4e53ad2303b0e",
+            "byteLength": 2004
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "typescript": {
+      "status": "reserved",
+      "plannedEntryPoint": "sort",
+      "plannedSourcePath": "src/main/typescript/sort/counting-sort.ts",
+      "plannedBasicTestPath": "src/test/typescript/sort/counting-sort.ts"
+    },
+    "python": {
+      "status": "reserved",
+      "plannedEntryPoint": "sort.counting_sort.sort",
+      "plannedSourcePath": "src/main/python/sort/counting_sort.py",
+      "plannedBasicTestPath": "src/test/python/sort/counting_sort.py"
+    },
+    "go": {
+      "status": "reserved",
+      "plannedEntryPoint": "sort.Counting",
+      "plannedSourcePath": "src/main/go/sort/counting_sort.go",
+      "plannedBasicTestPath": "src/test/go/sort/counting_sort.go"
+    },
+    "rust": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw_algorithm_archive::sort::counting_sort::sort",
+      "plannedSourcePath": "src/main/rust/src/sort/counting_sort.rs",
+      "plannedBasicTestPath": "src/test/rust/src/sort/counting_sort.rs"
+    },
+    "kotlin": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw.archive.sort.CountingSort.sort",
+      "plannedSourcePath": "src/main/kotlin/sort/CountingSort.kt",
+      "plannedBasicTestPath": "src/test/kotlin/sort/CountingSort.kt"
+    },
+    "cpp": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw::archive::sorts::counting",
+      "plannedSourcePath": "src/main/cpp/sort/counting_sort.cpp",
+      "plannedBasicTestPath": "src/test/cpp/sort/counting_sort.cpp"
+    },
+    "ruby": {
+      "status": "reserved",
+      "plannedEntryPoint": "SSW::Archive::Sort::CountingSort.sort",
+      "plannedSourcePath": "src/main/ruby/sort/counting_sort.rb",
+      "plannedBasicTestPath": "src/test/ruby/sort/counting_sort.rb"
+    }
+  },
+  "vectors": {
+    "counting-sort-basic": {
+      "path": "test-vectors/valid/counting-sort-basic.json",
+      "sha256": "f6c757c3279e0908114884711fb872b1d7b021932bcabc1ae20d725790f008c4",
+      "byteLength": 1325,
+      "caseCount": 8
+    }
+  },
+  "assets": {
+    "usage-scenario": {
+      "path": "assets/counting-sort/usage-scenario.json",
+      "sha256": "9e47577f445eb0f1dbdf4f221fbe90c9949d9446e5db947e37ea75ad3b8c8c33",
+      "byteLength": 3207
+    }
+  }
+}

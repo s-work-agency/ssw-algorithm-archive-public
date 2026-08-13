@@ -1,0 +1,206 @@
+{
+  "schemaVersion": "2.1",
+  "id": "aho-corasick",
+  "alternatives": [],
+  "documentation": {
+    "whenToUse": [
+      "키워드 사전 하나를 긴 로그나 문서에 반복 적용하고 모든 중첩 일치를 찾아야 할 때 적합해요."
+    ],
+    "avoidWhen": [
+      "패턴이 하나뿐이거나 유니코드 정규화·대소문자 접기 규칙까지 필요하면 전처리 정책을 먼저 정해야 해요."
+    ],
+    "tradeoffs": [
+      "패턴 총길이에 비례한 자동자를 미리 만들면 검색은 빠르지만 노드와 전이 정보를 위한 메모리가 필요해요."
+    ],
+    "pitfalls": [
+      "UTF-16 코드 단위와 유니코드 코드 포인트 인덱스를 섞으면 언어별 위치가 달라져 이 계약은 ASCII만 받아요."
+    ]
+  },
+  "contract": {
+    "input": {
+      "text": "ASCII string of at most 100000 characters",
+      "patterns": "at most 10000 objects with unique ASCII id and non-empty ASCII pattern; total pattern length at most 100000"
+    },
+    "output": {
+      "matches": "objects {patternId,start,end} with zero-based start and exclusive end character indices"
+    },
+    "errors": [
+      {
+        "code": "INVALID_TEXT"
+      },
+      {
+        "code": "INVALID_PATTERN"
+      },
+      {
+        "code": "DUPLICATE_PATTERN_ID"
+      },
+      {
+        "code": "INPUT_TOO_LARGE"
+      },
+      {
+        "code": "MATCH_LIMIT_EXCEEDED"
+      }
+    ],
+    "mutation": "input-must-not-mutate"
+  },
+  "complexity": {
+    "time": "O(textLength + totalPatternLength + matches * log(matches))",
+    "space": "O(totalPatternLength + matches)"
+  },
+  "preconditions": [
+    "text, pattern values, and pattern IDs contain only ASCII code points U+0000 through U+007F; pattern IDs are non-empty",
+    "empty patterns are invalid, while an empty patterns array or empty text returns no matches",
+    "start and end count ASCII characters, which are also UTF-8 bytes and UTF-16 code units under this policy",
+    "emit overlapping matches and sort them by end ascending, then start ascending, then original pattern input index ascending",
+    "reject with MATCH_LIMIT_EXCEEDED rather than returning more than 100000 matches"
+  ],
+  "implementations": {
+    "java": {
+      "status": "operational",
+      "entryPoint": "com.ssw.archive.stringalgorithms.AhoCorasick.execute",
+      "source": {
+        "primaryFile": "src/main/java/com/ssw/archive/stringalgorithms/AhoCorasick.java",
+        "files": {
+          "src/main/java/com/ssw/archive/stringalgorithms/AhoCorasick.java": {
+            "id": "source:src/main/java/com/ssw/archive/stringalgorithms/AhoCorasick.java",
+            "path": "src/main/java/com/ssw/archive/stringalgorithms/AhoCorasick.java",
+            "sha256": "bee49971204603732685a3d3ef94eecaef88a56352abcc9727818a5c69f01ce3",
+            "byteLength": 7351
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 6,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "javascript": {
+      "status": "operational",
+      "entryPoint": "AhoCorasick.execute",
+      "source": {
+        "primaryFile": "src/main/javascript/string/aho-corasick.js",
+        "files": {
+          "src/main/javascript/string/aho-corasick.js": {
+            "id": "source:src/main/javascript/string/aho-corasick.js",
+            "path": "src/main/javascript/string/aho-corasick.js",
+            "sha256": "67a3498b4fe3a90ae9d6b887041adbd8593c4a0fe43871a1f5bedc3c4513950f",
+            "byteLength": 5636
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 6,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "csharp": {
+      "status": "operational",
+      "entryPoint": "Ssw.Archive.StringAlgorithms.AhoCorasick.Execute",
+      "source": {
+        "primaryFile": "src/main/csharp/String/AhoCorasick.cs",
+        "files": {
+          "src/main/csharp/String/AhoCorasick.cs": {
+            "id": "source:src/main/csharp/String/AhoCorasick.cs",
+            "path": "src/main/csharp/String/AhoCorasick.cs",
+            "sha256": "43acc6ab6b23d4dfd917a208649129ead36a897b913cddf86b7d3ccb68de8f41",
+            "byteLength": 8199
+          }
+        }
+      },
+      "basicTest": null,
+      "verification": {
+        "vectors": {
+          "status": "passing",
+          "passed": 6,
+          "failed": 0,
+          "skipped": 0
+        },
+        "basicTest": {
+          "status": "not-run",
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "typescript": {
+      "status": "reserved",
+      "plannedEntryPoint": "execute",
+      "plannedSourcePath": "src/main/typescript/string/aho-corasick.ts",
+      "plannedBasicTestPath": "src/test/typescript/string/aho-corasick.ts"
+    },
+    "python": {
+      "status": "reserved",
+      "plannedEntryPoint": "string_algorithms.aho_corasick.execute",
+      "plannedSourcePath": "src/main/python/string_algorithms/aho_corasick.py",
+      "plannedBasicTestPath": "src/test/python/string_algorithms/aho_corasick.py"
+    },
+    "go": {
+      "status": "reserved",
+      "plannedEntryPoint": "string.ExecuteAhoCorasick",
+      "plannedSourcePath": "src/main/go/string/aho_corasick.go",
+      "plannedBasicTestPath": "src/test/go/string/aho_corasick.go"
+    },
+    "rust": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw_algorithm_archive::string::aho_corasick::execute",
+      "plannedSourcePath": "src/main/rust/src/string/aho_corasick.rs",
+      "plannedBasicTestPath": "src/test/rust/src/string/aho_corasick.rs"
+    },
+    "kotlin": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw.archive.string.AhoCorasick.execute",
+      "plannedSourcePath": "src/main/kotlin/string/AhoCorasick.kt",
+      "plannedBasicTestPath": "src/test/kotlin/string/AhoCorasick.kt"
+    },
+    "cpp": {
+      "status": "reserved",
+      "plannedEntryPoint": "ssw::archive::string::AhoCorasick::execute",
+      "plannedSourcePath": "src/main/cpp/string/aho_corasick.hpp",
+      "plannedBasicTestPath": "src/test/cpp/string/aho_corasick.hpp"
+    },
+    "ruby": {
+      "status": "reserved",
+      "plannedEntryPoint": "SSW::Archive::String::AhoCorasick.execute",
+      "plannedSourcePath": "src/main/ruby/string/aho_corasick.rb",
+      "plannedBasicTestPath": "src/test/ruby/string/aho_corasick.rb"
+    }
+  },
+  "vectors": {
+    "aho-corasick-wave-3": {
+      "path": "test-vectors/valid/aho-corasick-wave-3.json",
+      "sha256": "00eb5713cc9c23046c32889d583c76842ab38f0bbb231cf23ae27d91180ae452",
+      "byteLength": 3416,
+      "caseCount": 6
+    }
+  },
+  "assets": {
+    "usage-scenario": {
+      "path": "assets/aho-corasick/usage-scenario.json",
+      "sha256": "d6b11711b4998cb35a9860bb7dd4110d18c3763e438c219b333dda3b3b0b1c53",
+      "byteLength": 3434
+    }
+  }
+}

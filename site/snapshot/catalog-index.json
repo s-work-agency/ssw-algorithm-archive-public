@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "2.1",
+  "languages": [
+    "java",
+    "javascript",
+    "csharp",
+    "typescript",
+    "python",
+    "go",
+    "rust",
+    "kotlin",
+    "cpp",
+    "ruby"
+  ],
+  "coverageFields": [
+    "vectorCount",
+    "caseCount",
+    "verifiedLanguages",
+    "missingBasicTests",
+    "releaseReadyLanguages"
+  ],
+  "totals": {
+    "algorithmCount": 8,
+    "sourceCount": 24,
+    "vectorCount": 8,
+    "caseCount": 70,
+    "implementationCount": 80,
+    "operationalImplementations": 24,
+    "reservedImplementations": 56,
+    "verifiedImplementations": 24,
+    "missingBasicTestImplementations": 24,
+    "basicTestPassingImplementations": 0,
+    "releaseReadyImplementations": 0,
+    "passedChecks": 210,
+    "failedChecks": 0,
+    "skippedChecks": 0
+  },
+  "search": {
+    "path": "catalog-search.json",
+    "sha256": "bfc7a553c3be35c228fb87138ba388e1b86cbd342d2b8921c2e5ea976108a47e",
+    "byteLength": 4975
+  },
+  "algorithms": {
+    "a-star": {
+      "name": "A Star",
+      "summary": "heuristic-shortest-path graph algorithm",
+      "description": "목표까지의 남은 비용을 추정하는 휴리스틱으로 유망한 경로부터 탐색하는 최단 경로 알고리즘이에요.",
+      "category": "graph",
+      "family": "heuristic-shortest-path",
+      "implementationStatus": "OOORRRRRRR",
+      "coverage": "1,18,3,3,0",
+      "feedback": {
+        "status": "none",
+        "evidenceCount": 0,
+        "candidateCount": 0,
+        "approvedCount": 0,
+        "rejectedCount": 0,
+        "pendingCount": 0
+      },
+      "detail": {
+        "path": "algorithms/a-star.json",
+        "sha256": "31cb5a449dee1c62b6277d2e930defe6bba29fcfebf5868e8918172bb4c948e9",
+        "byteLength": 6600
+      }
+    },
+    "aho-corasick": {
+      "name": "Aho Corasick",
+      "summary": "multiple-pattern-matching string algorithm",
+      "description": "여러 ASCII 패턴을 하나의 실패 링크 자동자로 묶어 텍스트의 모든 겹치는 일치를 패턴 ID와 위치로 찾아요.",
+      "category": "string",
+      "family": "multiple-pattern-matching",
+      "implementationStatus": "OOORRRRRRR",
+      "coverage": "1,6,3,3,0",
+      "feedback": {
+        "status": "none",
+        "evidenceCount": 0,
+        "candidateCount": 0,
+        "approvedCount": 0,
+        "rejectedCount": 0,
+        "pendingCount": 0
+      },
+      "detail": {
+        "path": "algorithms/aho-corasick.json",
+        "sha256": "96ba02f08eb1c9d39b9d8d36a6127110d74663f69c43b6aa98868b33c511dea3",
+        "byteLength": 7236
+      }
+    },
+    "breadth-first-search": {
+      "name": "Breadth First Search",
+      "summary": "traversal graph algorithm",
+      "description": "시작점에서 가까운 정점부터 큐로 방문해 가중치 없는 그래프의 최소 단계를 구해요.",
+      "category": "graph",
+      "family": "traversal",
+      "implementationStatus": "OOORRRRRRR",
+      "coverage": "1,11,3,3,0",
+      "feedback": {
+        "status": "none",
+        "evidenceCount": 0,
+        "candidateCount": 0,
+        "approvedCount": 0,
+        "rejectedCount": 0,
+        "pendingCount": 0
+      },
+      "detail": {
+        "path": "algorithms/breadth-first-search.json",
+        "sha256": "d3c750b181215434eb9c9e226328c994c1c4e9ca5ed45cd4a562b30b2e8b648c",
+        "byteLength": 6650
+      }
+    },
+    "bubble-sort": {
+      "name": "Bubble Sort",
+      "summary": "comparison sort algorithm",
+      "description": "인접한 값을 반복 비교하고 교환해 큰 값을 배열 끝으로 밀어내는 단순 정렬이에요.",
+      "category": "sort",
+      "family": "comparison",
+      "implementationStatus": "OOORRRRRRR",
+      "coverage": "1,3,3,3,0",
+      "feedback": {
+        "status": "none",
+        "evidenceCount": 0,
+        "candidateCount": 0,
+        "approvedCount": 0,
+        "rejectedCount": 0,
+        "pendingCount": 0
+      },
+      "detail": {
+        "path": "algorithms/bubble-sort.json",
+        "sha256": "957b323148bd0f3e99e017b213340c6a25de4b58d236641c83a419bf6c80b739",
+        "byteLength": 5852
+      }
+    },
+    "counting-sort": {
+      "name": "Counting Sort",
+      "summary": "distribution sort algorithm",
+      "description": "각 정수 값의 출현 횟수를 세고 누적해 비교 없이 정렬 결과를 만들어요.",
+      "category": "sort",
+      "family": "distribution",
+      "implementationStatus": "OOORRRRRRR",
+      "coverage": "1,8,3,3,0",
+      "feedback": {
+        "status": "none",
+        "evidenceCount": 0,
+        "candidateCount": 0,
+        "approvedCount": 0,
+        "rejectedCount": 0,
+        "pendingCount": 0
+      },
+      "detail": {
+        "path": "algorithms/counting-sort.json",
+        "sha256": "e2f2549a8a3c7829e83ad645d68f7ccd121c0c1dbc73a2270aa1910b2db2694a",
+        "byteLength": 6189
+      }
+    },
+    "depth-first-search": {
+      "name": "Depth First Search",
+      "summary": "traversal graph algorithm",
+      "description": "한 경로를 끝까지 따라간 뒤 되돌아오며 스택 또는 재귀로 그래프를 탐색해요.",
+      "category": "graph",
+      "family": "traversal",
+      "implementationStatus": "OOORRRRRRR",
+      "coverage": "1,11,3,3,0",
+      "feedback": {
+        "status": "none",
+        "evidenceCount": 0,
+        "candidateCount": 0,
+        "approvedCount": 0,
+        "rejectedCount": 0,
+        "pendingCount": 0
+      },
+      "detail": {
+        "path": "algorithms/depth-first-search.json",
+        "sha256": "0f23f8b9adbeda107b7a284c91c12419b50dd511265066df35c7da18ad8d9370",
+        "byteLength": 6626
+      }
+    },
+    "kmp": {
+      "name": "Kmp",
+      "summary": "substring-search string algorithm",
+      "description": "패턴의 접두사와 접미사 정보를 재사용해 텍스트를 되돌아가지 않고 부분 문자열을 찾아요.",
+      "category": "string",
+      "family": "substring-search",
+      "implementationStatus": "OOORRRRRRR",
+      "coverage": "1,4,3,3,0",
+      "feedback": {
+        "status": "none",
+        "evidenceCount": 0,
+        "candidateCount": 0,
+        "approvedCount": 0,
+        "rejectedCount": 0,
+        "pendingCount": 0
+      },
+      "detail": {
+        "path": "algorithms/kmp.json",
+        "sha256": "4e2d741b330544ac9fafba3237481be031d55b6d3ec2f6b457c883caa9fe6aa5",
+        "byteLength": 6040
+      }
+    },
+    "quick-sort": {
+      "name": "Quick Sort",
+      "summary": "comparison sort algorithm",
+      "description": "피벗을 기준으로 작은 값과 큰 값을 나눈 뒤 각 구간을 재귀 정렬해요.",
+      "category": "sort",
+      "family": "comparison",
+      "implementationStatus": "OOORRRRRRR",
+      "coverage": "1,9,3,3,0",
+      "feedback": {
+        "status": "none",
+        "evidenceCount": 0,
+        "candidateCount": 0,
+        "approvedCount": 0,
+        "rejectedCount": 0,
+        "pendingCount": 0
+      },
+      "detail": {
+        "path": "algorithms/quick-sort.json",
+        "sha256": "951b955047ca8a11ef2f49081d4a168de76f75b7f1664593632e2258cba06f53",
+        "byteLength": 6140
+      }
+    }
+  }
+}
