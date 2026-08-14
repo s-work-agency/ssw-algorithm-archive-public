@@ -266,7 +266,7 @@ export const koreanUiStrings: UiStringTable = {
   // 벡터 실행기 (JavaScript 카드)
   "run.title": "브라우저에서 실행",
   "run.intro":
-    "위 소스를 그대로 Web Worker에서 실행합니다. 입력은 공식 벡터의 케이스이고, 결과는 그 케이스가 선언한 기대값과 대조합니다. {timeout}초를 넘기면 워커를 종료합니다.",
+    "위 소스를 그대로 브라우저의 별도 스레드(Web Worker)에서 격리 실행합니다. 입력은 공식 벡터의 케이스이고, 결과는 그 케이스가 선언한 기대값과 대조합니다. {timeout}초를 넘기면 워커를 강제 종료합니다.",
   "run.caseLabel": "벡터 케이스",
   "run.inputLabel": "입력 JSON (고쳐서 돌려볼 수 있습니다)",
   "run.run": "실행",
@@ -502,7 +502,7 @@ export const englishUiStrings: UiStringTable = {
   // Vector runner (JavaScript card)
   "run.title": "Run in the browser",
   "run.intro":
-    "Runs the source above as-is in a Web Worker. The input comes from an official vector case, and the result is checked against what that case declares. The worker is terminated after {timeout}s.",
+    "Runs the source above as-is on a separate browser thread (Web Worker), isolated from the page. The input comes from an official vector case, and the result is checked against what that case declares. The worker is force-terminated after {timeout}s.",
   "run.caseLabel": "Vector case",
   "run.inputLabel": "Input JSON (editable)",
   "run.run": "Run",
