@@ -1974,9 +1974,17 @@ select:focus {
   margin-inline: auto;
 }
 
-.about-doc > .table-wrap,
 .about-doc > .doc-code {
   max-width: var(--doc-wide);
+}
+
+/*
+  표는 산문과 같은 컬럼 폭에 세운다. 더 넓게 두면 열 셋짜리 짧은 표가 그 폭을
+  채우지 못해, 앞 열은 붙고 마지막 설명 열 뒤로 빈 자리가 길게 남는다. 본문과
+  좌우 끝을 맞추면 그 빈 자리가 사라지고 읽는 눈도 한 줄에서 움직인다.
+*/
+.about-doc > .table-wrap {
+  max-width: var(--doc-measure);
 }
 
 /*
@@ -2108,9 +2116,24 @@ select:focus {
   margin-bottom: 1.4rem;
 }
 
-/* 소개 문서의 표는 짧은 3열짜리라 데이터 표의 최소 폭(650px)이 과하다. */
+/*
+  소개 문서의 표. 데이터 표의 최소 폭(650px)은 열이 일곱인 커버리지 표를 위한
+  값이라 여기서는 과하다. 0으로 풀어 두면 좁은 폭에서 가로 스크롤 대신 설명 열이
+  줄바꿈으로 접힌다. 넘칠 때만 .table-wrap 의 가로 스크롤이 받는다.
+*/
 .doc-table {
-  min-width: 30rem;
+  min-width: 0;
+}
+
+/*
+  이름·분류처럼 값이 짧은 앞 열은 자기 폭만 쓰고, 남는 폭은 마지막 설명 열이
+  전부 받는다. auto 레이아웃에 맡기면 남는 폭을 열 셋이 비율로 나눠 가져, 짧은
+  앞 열이 필요 없이 벌어지고 설명 열은 그만큼 덜 받는다.
+*/
+.doc-table th:not(:last-child),
+.doc-table td:not(:last-child) {
+  width: 1%;
+  white-space: nowrap;
 }
 
 /*
