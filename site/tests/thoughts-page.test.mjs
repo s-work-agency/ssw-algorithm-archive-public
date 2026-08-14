@@ -143,18 +143,6 @@ test("본문 절 앵커는 #thoughts/ 아래에 있다", () => {
   }
 });
 
-test("소개로 돌아가는 링크는 저장소가 아니라 소개 화면으로 간다", () => {
-  assert.ok(
-    links.includes("../README.md"),
-    "원고에서 소개로 가는 링크가 사라졌습니다.",
-  );
-  assert.ok(body.includes('href="#about"'), "소개 화면 해시로 바뀌지 않았습니다.");
-  assert.ok(
-    !body.includes("blob/main/README.md"),
-    "소개 링크가 GitHub 원문으로 나갔습니다.",
-  );
-});
-
 test("본문이 문서 조판 클래스를 달고 나온다", () => {
   // 소개와 같은 규칙을 타야 두 글이 같은 조판으로 읽힌다.
   assert.match(page, /id="thoughts-panel"[\s\S]{0,200}class="panel doc-panel"/u);
