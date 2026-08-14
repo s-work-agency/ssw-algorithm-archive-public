@@ -115,16 +115,26 @@ test("자기 자신을 가리키는 안내는 README 에만 남고 사이트에�
 });
 
 test("빠지는 것은 그 구간 하나뿐이다", () => {
-  // 규칙이 조용히 다른 블록까지 집어가면 여기서 잡힌다. README 의 인용 둘 중
-  // 하나만 빠지고, 나머지 하나(비공개 저장소 안내)는 그대로 서 있어야 한다.
+  // 규칙이 조용히 다른 블록까지 집어가면 여기서 잡힌다. README 의 인용 중
+  // 사이트 주소 안내 하나만 빠지고 나머지는 그대로 서 있어야 한다.
   const readmeQuotes = [...readme.matchAll(/(?:^>.*\n)+/gmu)].length;
   const pageQuotes = [...page.matchAll(/class="doc-quote"/gu)].length;
-  assert.equal(readmeQuotes, 2, "README 의 인용 블록 수가 달라졌습니다.");
+  assert.equal(readmeQuotes, 3, "README 의 인용 블록 수가 달라졌습니다.");
   assert.equal(pageQuotes, readmeQuotes - 1, "빠진 블록 수가 1개가 아닙니다.");
-  assert.ok(
-    page.includes("본체 구현과 콘텐츠"),
-    "남아야 할 인용까지 빠졌습니다.",
+  for (const kept of ["본체 구현과 콘텐츠", "덧붙이면 이 기능은 원래 계획에"]) {
+    assert.ok(page.includes(kept), `남아야 할 인용까지 빠졌습니다: ${kept}`);
+  }
+});
+
+test("7절 기원 일화는 일반 문단이 아니라 인용 카드로 선다", () => {
+  const anecdote = "덧붙이면 이 기능은 원래 계획에";
+  // README 에서 인용으로 적혀야 빌드가 .doc-quote 카드로 렌더한다.
+  assert.match(readme, new RegExp(`^> ${anecdote}`, "mu"));
+  const card = new RegExp(
+    `<blockquote class="doc-quote">[\\s\\S]*?${anecdote}`,
+    "u",
   );
+  assert.match(page, card, "일화가 인용 카드로 서지 않았습니다.");
 });
 
 /** README 의 mermaid 블록. 노드 정의 줄과 화살표 수가 곧 기대값이다. */
@@ -230,6 +240,33 @@ test("소개 본문이 문서 조판 클래스를 달고 나온다", () => {
   ]) {
     assert.ok(page.includes(marker), `본문에 ${marker} 가 없습니다.`);
   }
+});
+
+test("소개 문서의 모든 블록이 하나의 가운데 축을 쓴다", () => {
+  /*
+    폭은 요소마다 달라도 되지만 가운데 축은 하나여야 한다. 축이 갈라졌던 원인은
+    margin 단축 속성이었다. margin: 0 0 1.4rem 은 좌우를 0으로 함께 덮어
+    margin-inline: auto 를 지우고, 그 요소만 왼쪽으로 치우친 축에 세운다.
+    인용 카드·구분선·코드·흐름도가 실제로 그렇게 어긋나 있었다.
+
+    그래서 여기서 잠그는 것은 개별 요소가 아니라 그 원인이다. 소개 문서 규칙
+    어디에도 margin 단축 속성이 없어야 한다. 새 블록이 추가돼도 같은 함정을
+    다시 밟지 않는다.
+  */
+  assert.match(styles, /\.about-doc > \* \{[^}]*margin-inline: auto/u);
+  assert.match(styles, /\.about-doc > \* \{[^}]*max-width: var\(--doc-measure\)/u);
+  const aboutRules = [
+    ...styles.matchAll(/(\.about-doc[^{]*|\.doc-[a-z-]+[^{]*)\{([^}]*)\}/gu),
+  ];
+  assert.ok(aboutRules.length > 10, "소개 문서 규칙을 읽지 못했습니다.");
+  const offenders = aboutRules
+    .filter(([, , body]) => /(^|;|\s)margin:\s/u.test(body))
+    .map(([, selector]) => selector.trim());
+  assert.deepEqual(
+    offenders,
+    [],
+    `margin 단축 속성이 좌우 정렬을 덮습니다. margin-block 을 쓰세요: ${offenders.join(", ")}`,
+  );
 });
 
 test("본문 컬럼과 CTA 가 카드 안에서 가운데로 놓인다", () => {

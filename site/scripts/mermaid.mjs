@@ -36,14 +36,24 @@ const metrics = {
   titleFontSize: 13,
   lineFontSize: 12,
   lineHeight: 17,
-  paddingX: 14,
+  /**
+   * 좌우 안여백. 글자 폭을 빌드 시점에 정확히 잴 수 없으므로 어림이 조금 모자라도
+   * 글자가 상자를 삐져나오지 않도록 넉넉히 둔다. 상자가 조금 넓어지는 것보다
+   * 글자가 테두리를 넘는 쪽이 훨씬 나쁘다.
+   */
+  paddingX: 18,
   paddingY: 12,
   /** 한 줄이 이 폭을 넘으면 공백에서 접는다. */
   maxLineWidth: 120,
-  gapX: 34,
+  gapX: 28,
   /** 간선 라벨이 있는 다이어그램은 층 사이를 넓힌다. 라벨이 설 자리가 필요하다. */
   gapXWithEdgeLabel: 58,
   gapY: 22,
+  /**
+   * 폭이 모자란 화면에서 그림을 줄일 수 있는 하한. 자연 크기의 이 비율 아래로는
+   * 줄이지 않고 상자 안에서 가로로 스크롤한다. 더 줄이면 글자가 읽을 수 없어진다.
+   */
+  minScale: 0.85,
   /** 판단 노드(육각형)가 좌우로 깎이는 만큼. 글자 자리는 그만큼 줄어든다. */
   decisionCut: 16,
   margin: 10,
@@ -255,8 +265,16 @@ export function layoutFlowchart(chart) {
     (columns[index] ??= []).push(node);
   }
 
+  /*
+    상자 폭은 층마다 따로 잡는다. 전 노드를 최장 라벨에 맞춰 통일하면 "계약"·"검증"
+    같은 짧은 상자가 쓸데없이 넓어지고, 그 낭비가 층 수만큼 곱해져 그림이 문서 띠를
+    넘는다. 배치는 계산된 실폭을 그대로 쓰므로 폭이 갈려도 어긋나지 않는다.
+
+    다만 같은 층에 세로로 쌓인 노드끼리는 폭을 맞춘다. 갈라져 나온 상자 둘의 왼쪽
+    끝과 오른쪽 끝이 어긋나면 그 자리만 눈에 걸린다. 높이는 그림 전체에서 하나로
+    통일한다 — 층마다 높이가 달라지면 간선이 향하는 높이도 함께 흔들린다.
+  */
   const boxes = new Map();
-  let nodeWidth = 0;
   let nodeHeight = 0;
   for (const node of chart.nodes.values()) {
     const cut = node.shape === "decision" ? metrics.decisionCut : 0;
@@ -271,15 +289,23 @@ export function layoutFlowchart(chart) {
     const widest = Math.max(
       ...wrapped.map((line) => textWidth(line.text, line.fontSize, line.bold)),
     );
-    nodeWidth = Math.max(nodeWidth, widest + 2 * (metrics.paddingX + cut));
     nodeHeight = Math.max(
       nodeHeight,
       2 * metrics.paddingY + wrapped.length * metrics.lineHeight,
     );
-    boxes.set(node.id, { node, wrapped });
+    boxes.set(node.id, {
+      node,
+      wrapped,
+      natural: widest + 2 * (metrics.paddingX + cut),
+    });
   }
-  nodeWidth = Math.round(nodeWidth);
   nodeHeight = Math.round(nodeHeight);
+
+  const columnWidths = columns.map((column) =>
+    Math.round(
+      Math.max(...column.map((node) => boxes.get(node.id).natural)),
+    ),
+  );
 
   const gapX = chart.edges.some((edge) => edge.label)
     ? metrics.gapXWithEdgeLabel
@@ -288,22 +314,26 @@ export function layoutFlowchart(chart) {
   const contentHeight = rows * nodeHeight + (rows - 1) * metrics.gapY;
   const width =
     2 * metrics.margin +
-    columns.length * nodeWidth +
+    columnWidths.reduce((sum, value) => sum + value, 0) +
     (columns.length - 1) * gapX;
   const height = 2 * metrics.margin + contentHeight;
 
+  let left = metrics.margin;
   for (const [index, column] of columns.entries()) {
     const stack =
       column.length * nodeHeight + (column.length - 1) * metrics.gapY;
     const top = metrics.margin + (contentHeight - stack) / 2;
     for (const [row, node] of column.entries()) {
       const box = boxes.get(node.id);
-      box.x = metrics.margin + index * (nodeWidth + gapX);
+      box.x = left;
       box.y = top + row * (nodeHeight + metrics.gapY);
+      box.width = columnWidths[index];
+      box.height = nodeHeight;
     }
+    left += columnWidths[index] + gapX;
   }
 
-  return { boxes, edges: chart.edges, width, height, nodeWidth, nodeHeight };
+  return { boxes, edges: chart.edges, width, height, nodeHeight };
 }
 
 function nodeOutline(box, width, height) {
@@ -340,10 +370,10 @@ export function renderFlowchartSvg(source, options = {}) {
   const edgePaths = layout.edges.map((edge) => {
     const from = layout.boxes.get(edge.from);
     const to = layout.boxes.get(edge.to);
-    const x1 = from.x + layout.nodeWidth;
-    const y1 = from.y + layout.nodeHeight / 2;
+    const x1 = from.x + from.width;
+    const y1 = from.y + from.height / 2;
     const x2 = to.x;
-    const y2 = to.y + layout.nodeHeight / 2;
+    const y2 = to.y + to.height / 2;
     // 0.5 를 넘기면 두 제어점이 서로를 지나쳐 짧은 간선에서 곡선이 접힌다.
     const bend = (x2 - x1) * 0.45;
     const path = `M${round(x1)} ${round(y1)} C${round(x1 + bend)} ${round(y1)}, ${round(x2 - bend)} ${round(y2)}, ${round(x2 - 1)} ${round(y2)}`;
@@ -360,8 +390,8 @@ export function renderFlowchartSvg(source, options = {}) {
 
   const nodeGroups = [...layout.boxes.values()].map((box) => {
     const totalText = box.wrapped.length * metrics.lineHeight;
-    const top = box.y + (layout.nodeHeight - totalText) / 2;
-    const centerX = box.x + layout.nodeWidth / 2;
+    const top = box.y + (box.height - totalText) / 2;
+    const centerX = box.x + box.width / 2;
     const texts = box.wrapped.map((line, index) => {
       const baseline = top + index * metrics.lineHeight + metrics.lineHeight - 5;
       const classes = ["doc-figure__text"];
@@ -386,7 +416,13 @@ export function renderFlowchartSvg(source, options = {}) {
     .join(", ")}`;
 
   const svg = [
-    `<svg class="doc-figure__svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeHtml(description)}" viewBox="0 0 ${layout.width} ${layout.height}" width="${layout.width}" height="${layout.height}">`,
+    /*
+      viewBox 를 들고 있어 폭이 모자라면 비율 그대로 줄어든다(styles.css 의
+      max-width: 100% · height: auto). 다만 끝없이 줄면 글자를 읽을 수 없으므로
+      자연 크기의 minScale 까지만 줄이고, 그 아래에서는 상자 안에서 스크롤한다.
+      하한은 다이어그램마다 다르므로 여기서 계산해 인라인으로 싣는다.
+    */
+    `<svg class="doc-figure__svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeHtml(description)}" viewBox="0 0 ${layout.width} ${layout.height}" width="${layout.width}" height="${layout.height}" style="min-width: ${Math.round(layout.width * metrics.minScale)}px">`,
     `<desc>${escapeHtml(description)}</desc>`,
     "<defs>",
     `<marker id="${markerId}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">`,
