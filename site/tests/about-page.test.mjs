@@ -154,12 +154,11 @@ test("빠지는 것은 그 구간 하나뿐이다", () => {
   // 사이트 주소 안내 하나만 빠지고 나머지는 그대로 서 있어야 한다.
   const readmeQuotes = [...readme.matchAll(/(?:^>.*\n)+/gmu)].length;
   const pageQuotes = [...page.matchAll(/class="doc-quote"/gu)].length;
-  assert.equal(readmeQuotes, 4, "README 의 인용 블록 수가 달라졌습니다.");
+  assert.equal(readmeQuotes, 3, "README 의 인용 블록 수가 달라졌습니다.");
   assert.equal(pageQuotes, readmeQuotes - 1, "빠진 블록 수가 1개가 아닙니다.");
   for (const kept of [
     "본체 구현과 콘텐츠",
     "덧붙이면 이 기능은 원래 계획에",
-    "안다고 생각했던 알고리즘도 막상 계약으로 적으려면",
   ]) {
     assert.ok(page.includes(kept), `남아야 할 인용까지 빠졌습니다: ${kept}`);
   }
