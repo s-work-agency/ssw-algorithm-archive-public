@@ -248,65 +248,65 @@
 <p>굴리는 방식도 가벼웠습니다. <strong>다른 작업과 병행</strong>하면서 <strong>개요 수준의 기획만</strong> 넘기고 알아서 진행하게 뒀고, 규모도 <strong>알고리즘 100종 정도 × 3개 언어</strong>를 <strong>단일 저장소 하나</strong>에 전부 넣는 형태였습니다. 이 시기가 얼마나 걸렸는지는 <strong>재지 않았습니다.</strong> 다른 일과 겹쳐 돌렸으니 애초에 계산이 되는 숫자가 아닙니다. 그런데 그렇게 던져 놓고 봤더니 되더라는 것이, 나중에 규모를 키워 볼 생각의 근거가 됐습니다.</p>
 <hr class="doc-rule" />
 <h3 id="about/2-세-언어로-먼저-검증했습니다">2. 세 언어로 먼저 검증했습니다</h3>
-<p>처음은 C# · Java · JavaScript 세 언어였습니다. 셋을 고른 데는 이유가 있습니다. <strong>정적 강타입 · JVM · 동적</strong>이라는 축이 서로 충분히 달라서, 계약에 빈틈이 있으면 세 언어 사이에서 먼저 드러납니다. 열 개 언어로 한꺼번에 벌린 뒤에 계약을 고치면 고칠 곳이 열 배가 됩니다.</p>
+<p>처음은 C# · Java · JavaScript 세 언어였습니다. 셋을 고른 데는 이유가 둘 있습니다. 하나는 <strong>가장 많이 다뤄 본 언어들</strong>이라는 점입니다. 처음 밟는 절차를 손에 익지 않은 언어로 시작하면, 결과가 어긋났을 때 계약이 모호한 것인지 그 언어를 몰라서인지 구분되지 않습니다. 다른 하나는 <strong>정적 강타입 · JVM · 동적</strong>이라는 축이 서로 충분히 달라서, 계약에 빈틈이 있으면 세 언어 사이에서 먼저 드러난다는 점입니다. 열 개 언어로 한꺼번에 벌린 뒤에 계약을 고치면 고칠 곳이 열 배가 됩니다.</p>
 <p>그 &quot;계약&quot;이 이 프로젝트에서 손이 가장 많이 간 물건입니다. 알고리즘 하나를 추가할 때 먼저 쓰는 건 구현이 아니라 <strong>입력 · 출력 · 오류 코드 · 복잡도 · 전제조건</strong>을 적은 문서입니다. 입력의 경계값은 어디까지인지, 실패하면 어떤 오류인지, 동점이면 누가 먼저인지, 출력의 순서에 의미가 있는지를 문장으로 확정해야 그다음 단계로 갑니다. &quot;대충 안다&quot;로는 한 종도 넘어가지 못합니다.</p>
-<p>여기서 첫 소득이 나왔습니다. <strong>안다고 생각한 것이 대부분 안 적힙니다.</strong> 교과서 설명은 &quot;최단 경로를 구한다&quot;에서 끝나는데, 최단 경로가 여럿이면 어느 것을 돌려줄지는 아무도 말해 주지 않습니다. 구현마다 다르고, 그래서 언어마다 다릅니다.</p>
+<p>여기서 첫 소득이 나왔습니다. <strong>안다고 생각했던 알고리즘도 막상 계약으로 적으려면 손이 멈춥니다.</strong> 아는 줄 알았던 것의 대부분이 문장으로 옮길 만큼 정확한 앎이 아니었던 것입니다. 교과서적인 설명은 &quot;최단 경로를 구한다&quot;에서 끝나는데, 최단 경로가 여럿이면 어느 것을 돌려줄지는 아무도 말해 주지 않습니다. 아무도 말해 주지 않았다는 것은 그 자리를 실은 몰랐다는 뜻이기도 합니다. 구현마다 다르고, 그래서 언어마다 다릅니다.</p>
 <p>계약을 먼저 적어 두면 그다음은 기계적으로 풀립니다.</p>
 <figure class="doc-figure">
-<svg class="doc-figure__svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="흐름도: 계약 → 언어 중립 테스트 벡터, 언어 중립 테스트 벡터 → 10개 언어 구현, 10개 언어 구현 → 검증, 검증 → 카탈로그, 카탈로그 → 사람, 카탈로그 → LLM 모델" viewBox="0 0 1048 226" width="1048" height="226">
+<svg class="doc-figure__svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="흐름도: 계약 → 언어 중립 테스트 벡터, 언어 중립 테스트 벡터 → 10개 언어 구현, 10개 언어 구현 → 검증, 검증 → 카탈로그, 카탈로그 → 사람, 카탈로그 → LLM 모델" viewBox="0 0 945 226" width="945" height="226" style="min-width: 803px">
 <desc>흐름도: 계약 → 언어 중립 테스트 벡터, 언어 중립 테스트 벡터 → 10개 언어 구현, 10개 언어 구현 → 검증, 검증 → 카탈로그, 카탈로그 → 사람, 카탈로그 → LLM 모델</desc>
 <defs>
 <marker id="doc-figure-arrow-0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
 <path class="doc-figure__arrowhead" d="M0 0 L10 5 L0 10 Z" />
 </marker>
 </defs>
-<path class="doc-figure__edge" d="M153 113 C168.3 113, 171.7 113, 186 113" marker-end="url(#doc-figure-arrow-0)" />
-<path class="doc-figure__edge" d="M330 113 C345.3 113, 348.7 113, 363 113" marker-end="url(#doc-figure-arrow-0)" />
-<path class="doc-figure__edge" d="M507 113 C522.3 113, 525.7 113, 540 113" marker-end="url(#doc-figure-arrow-0)" />
-<path class="doc-figure__edge" d="M684 113 C699.3 113, 702.7 113, 717 113" marker-end="url(#doc-figure-arrow-0)" />
-<path class="doc-figure__edge" d="M861 113 C876.3 113, 879.7 56, 894 56" marker-end="url(#doc-figure-arrow-0)" />
-<path class="doc-figure__edge" d="M861 113 C876.3 113, 879.7 170, 894 170" marker-end="url(#doc-figure-arrow-0)" />
+<path class="doc-figure__edge" d="M143 113 C155.6 113, 158.4 113, 170 113" marker-end="url(#doc-figure-arrow-0)" />
+<path class="doc-figure__edge" d="M305 113 C317.6 113, 320.4 113, 332 113" marker-end="url(#doc-figure-arrow-0)" />
+<path class="doc-figure__edge" d="M484 113 C496.6 113, 499.4 113, 511 113" marker-end="url(#doc-figure-arrow-0)" />
+<path class="doc-figure__edge" d="M639 113 C651.6 113, 654.4 113, 666 113" marker-end="url(#doc-figure-arrow-0)" />
+<path class="doc-figure__edge" d="M776 113 C788.6 113, 791.4 56, 803 56" marker-end="url(#doc-figure-arrow-0)" />
+<path class="doc-figure__edge" d="M776 113 C788.6 113, 791.4 170, 803 170" marker-end="url(#doc-figure-arrow-0)" />
 <g>
-<rect class="doc-figure__box" x="10" y="67" width="143" height="92" rx="10" />
-<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="81.5" y="99.5" text-anchor="middle" style="font-size: 13px">계약</text>
-<text class="doc-figure__text" x="81.5" y="116.5" text-anchor="middle" style="font-size: 12px">입출력 · 오류 ·</text>
-<text class="doc-figure__text" x="81.5" y="133.5" text-anchor="middle" style="font-size: 12px">복잡도 · 전제조건</text>
+<rect class="doc-figure__box" x="10" y="67" width="undefined" height="92" rx="10" />
+<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="76.5" y="99.5" text-anchor="middle" style="font-size: 13px">계약</text>
+<text class="doc-figure__text" x="76.5" y="116.5" text-anchor="middle" style="font-size: 12px">입출력 · 오류 ·</text>
+<text class="doc-figure__text" x="76.5" y="133.5" text-anchor="middle" style="font-size: 12px">복잡도 · 전제조건</text>
 </g>
 <g>
-<rect class="doc-figure__box" x="187" y="67" width="143" height="92" rx="10" />
-<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="258.5" y="91" text-anchor="middle" style="font-size: 13px">언어 중립</text>
-<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="258.5" y="108" text-anchor="middle" style="font-size: 13px">테스트 벡터</text>
-<text class="doc-figure__text" x="258.5" y="125" text-anchor="middle" style="font-size: 12px">입력과 기대</text>
-<text class="doc-figure__text" x="258.5" y="142" text-anchor="middle" style="font-size: 12px">출력만 적은 JSON</text>
+<rect class="doc-figure__box" x="171" y="67" width="undefined" height="92" rx="10" />
+<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="238" y="91" text-anchor="middle" style="font-size: 13px">언어 중립</text>
+<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="238" y="108" text-anchor="middle" style="font-size: 13px">테스트 벡터</text>
+<text class="doc-figure__text" x="238" y="125" text-anchor="middle" style="font-size: 12px">입력과 기대</text>
+<text class="doc-figure__text" x="238" y="142" text-anchor="middle" style="font-size: 12px">출력만 적은 JSON</text>
 </g>
 <g>
-<rect class="doc-figure__box" x="364" y="67" width="143" height="92" rx="10" />
-<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="435.5" y="108" text-anchor="middle" style="font-size: 13px">10개 언어 구현</text>
-<text class="doc-figure__text" x="435.5" y="125" text-anchor="middle" style="font-size: 12px">알고리즘당 자립 파일</text>
+<rect class="doc-figure__box" x="333" y="67" width="undefined" height="92" rx="10" />
+<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="408.5" y="108" text-anchor="middle" style="font-size: 13px">10개 언어 구현</text>
+<text class="doc-figure__text" x="408.5" y="125" text-anchor="middle" style="font-size: 12px">알고리즘당 자립 파일</text>
 </g>
 <g>
-<rect class="doc-figure__box" x="541" y="67" width="143" height="92" rx="10" />
-<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="612.5" y="99.5" text-anchor="middle" style="font-size: 13px">검증</text>
-<text class="doc-figure__text" x="612.5" y="116.5" text-anchor="middle" style="font-size: 12px">실행 결과를 다시</text>
-<text class="doc-figure__text" x="612.5" y="133.5" text-anchor="middle" style="font-size: 12px">만들어 대조</text>
+<rect class="doc-figure__box" x="512" y="67" width="undefined" height="92" rx="10" />
+<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="575.5" y="99.5" text-anchor="middle" style="font-size: 13px">검증</text>
+<text class="doc-figure__text" x="575.5" y="116.5" text-anchor="middle" style="font-size: 12px">실행 결과를 다시</text>
+<text class="doc-figure__text" x="575.5" y="133.5" text-anchor="middle" style="font-size: 12px">만들어 대조</text>
 </g>
 <g>
-<rect class="doc-figure__box" x="718" y="67" width="143" height="92" rx="10" />
-<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="789.5" y="99.5" text-anchor="middle" style="font-size: 13px">카탈로그</text>
-<text class="doc-figure__text" x="789.5" y="116.5" text-anchor="middle" style="font-size: 12px">설명 · 계약 ·</text>
-<text class="doc-figure__text" x="789.5" y="133.5" text-anchor="middle" style="font-size: 12px">테스트 · 소스</text>
+<rect class="doc-figure__box" x="667" y="67" width="undefined" height="92" rx="10" />
+<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="721.5" y="99.5" text-anchor="middle" style="font-size: 13px">카탈로그</text>
+<text class="doc-figure__text" x="721.5" y="116.5" text-anchor="middle" style="font-size: 12px">설명 · 계약 ·</text>
+<text class="doc-figure__text" x="721.5" y="133.5" text-anchor="middle" style="font-size: 12px">테스트 · 소스</text>
 </g>
 <g>
-<rect class="doc-figure__box" x="895" y="10" width="143" height="92" rx="10" />
-<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="966.5" y="42.5" text-anchor="middle" style="font-size: 13px">사람</text>
-<text class="doc-figure__text" x="966.5" y="59.5" text-anchor="middle" style="font-size: 12px">정적 웹에서</text>
-<text class="doc-figure__text" x="966.5" y="76.5" text-anchor="middle" style="font-size: 12px">탐색·비교</text>
+<rect class="doc-figure__box" x="804" y="10" width="undefined" height="92" rx="10" />
+<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="869.5" y="42.5" text-anchor="middle" style="font-size: 13px">사람</text>
+<text class="doc-figure__text" x="869.5" y="59.5" text-anchor="middle" style="font-size: 12px">정적 웹에서</text>
+<text class="doc-figure__text" x="869.5" y="76.5" text-anchor="middle" style="font-size: 12px">탐색·비교</text>
 </g>
 <g>
-<rect class="doc-figure__box" x="895" y="124" width="143" height="92" rx="10" />
-<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="966.5" y="156.5" text-anchor="middle" style="font-size: 13px">LLM 모델</text>
-<text class="doc-figure__text" x="966.5" y="173.5" text-anchor="middle" style="font-size: 12px">web · WPF 등에서</text>
-<text class="doc-figure__text" x="966.5" y="190.5" text-anchor="middle" style="font-size: 12px">MCP 도구로 조회</text>
+<rect class="doc-figure__box" x="804" y="124" width="undefined" height="92" rx="10" />
+<text class="doc-figure__text doc-figure__text--title doc-figure__text--bold" x="869.5" y="156.5" text-anchor="middle" style="font-size: 13px">LLM 모델</text>
+<text class="doc-figure__text" x="869.5" y="173.5" text-anchor="middle" style="font-size: 12px">web · WPF 등에서</text>
+<text class="doc-figure__text" x="869.5" y="190.5" text-anchor="middle" style="font-size: 12px">MCP 도구로 조회</text>
 </g>
 </svg>
 </figure>
@@ -366,51 +366,51 @@
 <h3 id="about/7-브라우저에서-그-자리에서-돌려-봅니다">7. 브라우저에서 그 자리에서 돌려 봅니다</h3>
 <p>상세 화면의 <strong>JavaScript 소스 카드에는 실행기가 붙어 있습니다.</strong> 화면에 떠 있는 그 소스를 브라우저에서 그대로 돌리고, 입력은 <strong>공식 벡터의 케이스</strong>를 씁니다. 결과는 그 케이스가 선언한 기대값과 대조합니다.</p>
 <figure class="doc-figure">
-<svg class="doc-figure__svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="흐름도: 화면의 소스 → Web Worker, 공식 벡터 케이스 → Web Worker, Web Worker → 기대값과 같은가, 기대값과 같은가 → 통과 (같음), 기대값과 같은가 → 실패 · 시간 초과 · 실행 오류 (다름)" viewBox="0 0 814 192" width="814" height="192">
+<svg class="doc-figure__svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="흐름도: 화면의 소스 → Web Worker, 공식 벡터 케이스 → Web Worker, Web Worker → 기대값과 같은가, 기대값과 같은가 → 통과 (같음), 기대값과 같은가 → 실패 · 시간 초과 · 실행 오류 (다름)" viewBox="0 0 752 192" width="752" height="192" style="min-width: 639px">
 <desc>흐름도: 화면의 소스 → Web Worker, 공식 벡터 케이스 → Web Worker, Web Worker → 기대값과 같은가, 기대값과 같은가 → 통과 (같음), 기대값과 같은가 → 실패 · 시간 초과 · 실행 오류 (다름)</desc>
 <defs>
 <marker id="doc-figure-arrow-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
 <path class="doc-figure__arrowhead" d="M0 0 L10 5 L0 10 Z" />
 </marker>
 </defs>
-<path class="doc-figure__edge" d="M165 47.5 C191.1 47.5, 196.9 96, 222 96" marker-end="url(#doc-figure-arrow-1)" />
-<path class="doc-figure__edge" d="M165 144.5 C191.1 144.5, 196.9 96, 222 96" marker-end="url(#doc-figure-arrow-1)" />
-<path class="doc-figure__edge" d="M378 96 C404.1 96, 409.9 96, 435 96" marker-end="url(#doc-figure-arrow-1)" />
-<path class="doc-figure__edge" d="M591 96 C617.1 96, 622.9 47.5, 648 47.5" marker-end="url(#doc-figure-arrow-1)" />
-<rect class="doc-figure__edge-chip" x="603" y="62.75" width="34" height="18" rx="9" />
-<text class="doc-figure__edge-label" x="620" y="75.75" text-anchor="middle">같음</text>
-<path class="doc-figure__edge" d="M591 96 C617.1 96, 622.9 144.5, 648 144.5" marker-end="url(#doc-figure-arrow-1)" />
-<rect class="doc-figure__edge-chip" x="603" y="111.25" width="34" height="18" rx="9" />
-<text class="doc-figure__edge-label" x="620" y="124.25" text-anchor="middle">다름</text>
+<path class="doc-figure__edge" d="M144 47.5 C170.1 47.5, 175.9 96, 201 96" marker-end="url(#doc-figure-arrow-1)" />
+<path class="doc-figure__edge" d="M144 144.5 C170.1 144.5, 175.9 96, 201 96" marker-end="url(#doc-figure-arrow-1)" />
+<path class="doc-figure__edge" d="M321 96 C347.1 96, 352.9 96, 378 96" marker-end="url(#doc-figure-arrow-1)" />
+<path class="doc-figure__edge" d="M542 96 C568.1 96, 573.9 47.5, 599 47.5" marker-end="url(#doc-figure-arrow-1)" />
+<rect class="doc-figure__edge-chip" x="554" y="62.75" width="34" height="18" rx="9" />
+<text class="doc-figure__edge-label" x="571" y="75.75" text-anchor="middle">같음</text>
+<path class="doc-figure__edge" d="M542 96 C568.1 96, 573.9 144.5, 599 144.5" marker-end="url(#doc-figure-arrow-1)" />
+<rect class="doc-figure__edge-chip" x="554" y="111.25" width="34" height="18" rx="9" />
+<text class="doc-figure__edge-label" x="571" y="124.25" text-anchor="middle">다름</text>
 <g>
-<rect class="doc-figure__box" x="10" y="10" width="155" height="75" rx="10" />
-<text class="doc-figure__text doc-figure__text--title" x="87.5" y="34" text-anchor="middle" style="font-size: 13px">화면의 소스</text>
-<text class="doc-figure__text" x="87.5" y="51" text-anchor="middle" style="font-size: 12px">해시 대조를</text>
-<text class="doc-figure__text" x="87.5" y="68" text-anchor="middle" style="font-size: 12px">통과한 바이트</text>
+<rect class="doc-figure__box" x="10" y="10" width="undefined" height="75" rx="10" />
+<text class="doc-figure__text doc-figure__text--title" x="77" y="34" text-anchor="middle" style="font-size: 13px">화면의 소스</text>
+<text class="doc-figure__text" x="77" y="51" text-anchor="middle" style="font-size: 12px">해시 대조를</text>
+<text class="doc-figure__text" x="77" y="68" text-anchor="middle" style="font-size: 12px">통과한 바이트</text>
 </g>
 <g>
-<rect class="doc-figure__box" x="10" y="107" width="155" height="75" rx="10" />
-<text class="doc-figure__text doc-figure__text--title" x="87.5" y="139.5" text-anchor="middle" style="font-size: 13px">공식 벡터 케이스</text>
-<text class="doc-figure__text" x="87.5" y="156.5" text-anchor="middle" style="font-size: 12px">입력 · 기대값</text>
+<rect class="doc-figure__box" x="10" y="107" width="undefined" height="75" rx="10" />
+<text class="doc-figure__text doc-figure__text--title" x="77" y="139.5" text-anchor="middle" style="font-size: 13px">공식 벡터 케이스</text>
+<text class="doc-figure__text" x="77" y="156.5" text-anchor="middle" style="font-size: 12px">입력 · 기대값</text>
 </g>
 <g>
-<rect class="doc-figure__box" x="223" y="58.5" width="155" height="75" rx="10" />
-<text class="doc-figure__text doc-figure__text--title" x="300.5" y="82.5" text-anchor="middle" style="font-size: 13px">Web Worker</text>
-<text class="doc-figure__text" x="300.5" y="99.5" text-anchor="middle" style="font-size: 12px">별도 스레드</text>
-<text class="doc-figure__text" x="300.5" y="116.5" text-anchor="middle" style="font-size: 12px">격리 · 2초 제한</text>
+<rect class="doc-figure__box" x="202" y="58.5" width="undefined" height="75" rx="10" />
+<text class="doc-figure__text doc-figure__text--title" x="261.5" y="82.5" text-anchor="middle" style="font-size: 13px">Web Worker</text>
+<text class="doc-figure__text" x="261.5" y="99.5" text-anchor="middle" style="font-size: 12px">별도 스레드</text>
+<text class="doc-figure__text" x="261.5" y="116.5" text-anchor="middle" style="font-size: 12px">격리 · 2초 제한</text>
 </g>
 <g>
-<path class="doc-figure__box doc-figure__box--decision" d="M436 96 L452 58.5 L575 58.5 L591 96 L575 133.5 L452 133.5 Z" />
-<text class="doc-figure__text doc-figure__text--title" x="513.5" y="99.5" text-anchor="middle" style="font-size: 13px">기대값과 같은가</text>
+<path class="doc-figure__box doc-figure__box--decision" d="M379 96 L395 58.5 LNaN 58.5 LNaN 96 LNaN 133.5 L395 133.5 Z" />
+<text class="doc-figure__text doc-figure__text--title" x="460.5" y="99.5" text-anchor="middle" style="font-size: 13px">기대값과 같은가</text>
 </g>
 <g>
-<rect class="doc-figure__box" x="649" y="10" width="155" height="75" rx="10" />
-<text class="doc-figure__text doc-figure__text--title" x="726.5" y="51" text-anchor="middle" style="font-size: 13px">통과</text>
+<rect class="doc-figure__box" x="600" y="10" width="undefined" height="75" rx="10" />
+<text class="doc-figure__text doc-figure__text--title" x="671" y="51" text-anchor="middle" style="font-size: 13px">통과</text>
 </g>
 <g>
-<rect class="doc-figure__box" x="649" y="107" width="155" height="75" rx="10" />
-<text class="doc-figure__text doc-figure__text--title" x="726.5" y="139.5" text-anchor="middle" style="font-size: 13px">실패 · 시간 초과 ·</text>
-<text class="doc-figure__text doc-figure__text--title" x="726.5" y="156.5" text-anchor="middle" style="font-size: 13px">실행 오류</text>
+<rect class="doc-figure__box" x="600" y="107" width="undefined" height="75" rx="10" />
+<text class="doc-figure__text doc-figure__text--title" x="671" y="139.5" text-anchor="middle" style="font-size: 13px">실패 · 시간 초과 ·</text>
+<text class="doc-figure__text doc-figure__text--title" x="671" y="156.5" text-anchor="middle" style="font-size: 13px">실행 오류</text>
 </g>
 </svg>
 </figure>
@@ -421,7 +421,9 @@
 <li>판정은 느슨하지 않습니다. 출력 케이스는 값이 정확히 같아야 하고, 오류를 기대하는 케이스는 <strong>계약이 선언한 오류 코드까지 같아야</strong> 통과입니다. 아무 예외나 났다고 통과시키면 오류 계약을 검사하지 않는 것과 같습니다.</li>
 </ul>
 <p>이 기능은 <a href="#about/1-가볍게-시작했습니다">1절</a>의 출발점과 곧장 이어집니다. &quot;검증된 구현을 참조해 꺼내 쓴다&quot;가 성립하려면 <strong>꺼낸 코드가 계약대로 도는지 보는 비용이 0에 가까워야</strong> 합니다. 소스를 내려받아 프로젝트에 붙여 보고 나서야 확인이 되는 구조라면, 사람도 모델도 결국 다시 검증 비용을 치릅니다. 여기서는 읽던 화면에서 확인이 끝납니다. 자립 파일이라는 제약이 실제로 값을 하는 자리이기도 합니다. 받은 바이트를 그대로 워커 스크립트로 삼는 것만으로 확인이 끝납니다.</p>
+<blockquote class="doc-quote">
 <p>덧붙이면 이 기능은 원래 계획에 없었습니다. 작업 중에 제안으로 올라왔고, 사람이 한 일은 그 제안을 받기로 정한 것뿐입니다. 1절에서 말한 가이드도 대개 이런 모양이라, 무엇을 만들지 먼저 지시하기보다 올라온 것 중에서 무엇을 남길지 고르는 쪽이었습니다.</p>
+</blockquote>
 <p>&quot;검증됐다&quot;는 문장을 믿어 달라고 하는 대신, 그 문장이 무엇을 확인한 결과인지 직접 밟아 볼 수 있게 한 셈입니다. 브라우저가 그대로 돌릴 수 있는 언어가 JavaScript뿐이라 실행기는 그 카드에만 붙고, 나머지 두 언어는 파이프라인이 남긴 검증 결과 요약으로 확인합니다.</p>
 <hr class="doc-rule" />
 <h3 id="about/8-더-읽기">8. 더 읽기</h3>
