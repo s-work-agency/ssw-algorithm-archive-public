@@ -1867,6 +1867,248 @@ select:focus {
   color: var(--status-neutral-text);
 }
 
+/*
+  소개 화면.
+
+  카탈로그 화면들이 "찾아보는" 자리라면 여기는 "읽는" 자리다. 본문은 저장소
+  README 를 빌드가 옮긴 긴 산문이라, 카드 격자 대신 문서 조판 규칙을 따로 둔다.
+  다만 색·타이포·라운드는 새로 만들지 않고 기존 토큰만 쓴다 — 화면 하나가
+  다른 사이트처럼 보이면 안 되고, 다크 전환도 토큰을 타야 저절로 따라온다.
+
+  본문 폭만 좁힌다. 표·코드 블록은 좁히면 오히려 읽기 어려워지므로 패널 폭을
+  그대로 쓰고, 넘치는 폭은 각자의 가로 스크롤이 받는다.
+*/
+.about-panel {
+  /* 한 줄에 한글 45자 안팎. 눈이 다음 줄 첫 글자를 놓치지 않는 폭이다. */
+  --doc-measure: 46rem;
+}
+
+.about-panel__heading {
+  align-items: center;
+  margin-bottom: 1.4rem;
+}
+
+/*
+  화면 이름은 탑바가 크게 들고 있다. 여기 라벨은 그 이름을 본문 위에서 한 번 더
+  확인해 주는 자리라, 제목이 아니라 작은 눈썹 문구로 둔다 — README 의 제목이
+  이 화면에서 유일한 큰 제목이어야 문서의 층이 하나로 읽힌다.
+*/
+.about-panel__eyebrow {
+  margin: 0;
+  color: var(--text-subtle);
+  font-size: 0.82rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+}
+
+/*
+  데모 진입. 이 사이트의 무기가 브라우저 실행이라, 이야기를 읽는 중에도 목록이
+  한 번의 클릭 거리에 있어야 한다. 화면을 되돌리는 .detail-back 과 달리 앞으로
+  나아가는 조작이라, 같은 알약 꼴을 쓰되 강조 면을 채워 무게를 다르게 준다.
+*/
+.about-cta {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 0.5rem 1.05rem;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-size: 0.9rem;
+  font-weight: 750;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.about-cta:hover {
+  background: var(--accent-deep);
+}
+
+.about-cta:active {
+  background: var(--accent-strong);
+}
+
+.about-cta:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 0.15rem;
+}
+
+/*
+  본문 상자. 화면 이동으로 들어왔을 때 초점을 받는 자리이기도 하다(tabindex="-1").
+  마우스로 들어온 이동에서는 링을 그리지 않도록 :focus-visible 만 본다.
+*/
+.about-doc:focus-visible {
+  border-radius: var(--radius-xs);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 0.4rem;
+}
+
+.about-doc > * {
+  max-width: var(--doc-measure);
+}
+
+/* 표·코드는 읽기 폭을 넘겨도 된다. 넘치는 폭은 각자 안에서 스크롤된다. */
+.about-doc > .table-wrap,
+.about-doc > .doc-code {
+  max-width: none;
+}
+
+/*
+  README 의 제목 층. 원문 `#` 이 여기서 h2 가 된다(화면 제목 h1 은 탑바가 든다).
+  절 제목 위에는 구분선 대신 넉넉한 여백을 둬, README 의 `---` 가 만드는 실제
+  구분선과 층이 겹치지 않게 한다.
+*/
+.about-doc h2 {
+  margin-bottom: 1.1rem;
+  color: var(--text);
+  font-size: clamp(1.5rem, 3.4vw, 1.9rem);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.about-doc h3 {
+  margin-top: 2.4rem;
+  margin-bottom: 0.9rem;
+  color: var(--text-heading);
+  font-size: 1.28rem;
+  line-height: 1.4;
+}
+
+.about-doc h4 {
+  margin-top: 1.8rem;
+  color: var(--text-heading);
+  font-size: 1.05rem;
+}
+
+/* 앵커로 이동한 제목이 sticky 탑바 밑으로 들어가지 않게 한다. */
+.about-doc :is(h2, h3, h4, h5, h6) {
+  scroll-margin-top: var(--anchor-offset);
+}
+
+.about-doc p {
+  margin-bottom: 1.15rem;
+  color: var(--text-body);
+  font-size: 1.02rem;
+  line-height: 1.85;
+}
+
+/*
+  README 는 굵게로 문장의 뼈대를 짚는다. 산문에서 이 표시가 자주 나오므로 색까지
+  바꾸면 화면이 얼룩진다 — 무게만 올리고 색은 본문보다 한 단계 진하게만 둔다.
+*/
+.about-doc strong {
+  color: var(--text);
+  font-weight: 750;
+}
+
+.about-doc a {
+  color: var(--accent-link);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.about-doc a:hover {
+  color: var(--accent-strong);
+}
+
+.about-doc a:focus-visible {
+  border-radius: var(--radius-focus);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 0.15rem;
+}
+
+/* 산문 안 짧은 코드. 계약 필드·경계값이라 본문 흐름을 끊지 않을 만큼만 표시한다. */
+.about-doc :not(pre) > code {
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-chip);
+  background: var(--surface-accent);
+  color: var(--text-heading);
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+
+.about-doc .doc-list {
+  margin-bottom: 1.15rem;
+  padding-left: 1.25rem;
+  color: var(--text-body);
+  font-size: 1.02rem;
+  line-height: 1.85;
+}
+
+.about-doc .doc-list li + li {
+  margin-top: 0.6rem;
+}
+
+.about-doc .doc-list::marker,
+.about-doc .doc-list li::marker {
+  color: var(--text-subtle);
+}
+
+/* 인용은 본문 옆에 붙는 곁말이라, 계획 안내(.roadmap-plan-note)와 같은 어법을 쓴다. */
+.about-doc .doc-quote {
+  margin: 0 0 1.4rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 3px solid var(--accent-border);
+  border-radius: var(--radius-md);
+  background: var(--accent-tint);
+}
+
+.about-doc .doc-quote p {
+  margin-bottom: 0;
+  color: var(--text-body);
+  font-size: 0.96rem;
+}
+
+.about-doc .doc-quote p + p {
+  margin-top: 0.6rem;
+}
+
+.about-doc .doc-rule {
+  margin: 2.6rem 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+.about-doc .table-wrap {
+  margin-bottom: 1.4rem;
+}
+
+/* 소개 문서의 표는 짧은 3열짜리라 데이터 표의 최소 폭(650px)이 과하다. */
+.doc-table {
+  min-width: 30rem;
+}
+
+/*
+  코드 블록. 이 사이트에는 mermaid 를 그릴 라이브러리가 없다(외부 호스트 요청이
+  막혀 있다). 그래서 다이어그램 블록도 그림으로 세우지 않고 코드 그대로 내보내고,
+  무엇으로 적힌 코드인지는 오른쪽 위 언어 표시가 알린다. 코드면은 상세 화면의
+  소스 블록과 같은 --surface-code 라 양 테마에서 같은 면을 쓴다.
+*/
+.about-doc .doc-code {
+  position: relative;
+  overflow-x: auto;
+  margin: 0 0 1.4rem;
+  padding: 1.1rem;
+  border-radius: var(--radius-code);
+  background: var(--surface-code);
+  color: var(--text-code);
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  line-height: 1.7;
+}
+
+.about-doc .doc-code[data-language]::before {
+  float: right;
+  margin-left: 1rem;
+  color: var(--text-code-control);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  content: attr(data-language);
+}
+
 /* ≤820px: 사이드바를 슬라이드 드로어로 전환한다. */
 @media (max-width: 820px) {
   .app-shell {

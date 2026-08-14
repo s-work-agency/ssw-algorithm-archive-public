@@ -31,7 +31,9 @@ export const koreanUiStrings = {
     "document.description": "설명·계약·테스트·언어별 원본 코드와 커버리지 현황을 제공하는 SSW Algorithm Archive",
     "skipLink.toContent": "본문으로 건너뛰기",
     "brand.tagline": "알고리즘 카탈로그",
-    "sidebar.navLabel": "카탈로그 영역",
+    // 소개가 카탈로그 밖 항목으로 들어오면서 이 nav 는 카탈로그 영역만 담지 않는다.
+    "sidebar.navLabel": "사이트 영역",
+    "sidebar.about": "소개",
     "sidebar.groupLabel": "카탈로그",
     "sidebar.list": "목록",
     "sidebar.coverage": "커버리지",
@@ -39,9 +41,20 @@ export const koreanUiStrings = {
     "topbar.languageGroup": "표시 언어",
     "topbar.darkMode": "다크 모드",
     // 화면 이름 (탑바 제목)
+    "screen.about": "소개",
     "screen.list": "알고리즘 목록",
     "screen.coverage": "커버리지 매트릭스",
     "screen.fallback": "알고리즘 카탈로그",
+    /*
+      소개 화면. 본문은 저장소 README를 빌드가 옮긴 것이라 이 표를 타지 않고
+      한국어 원문 그대로다(카탈로그 발행 콘텐츠와 같은 취급이다). 여기 담는 것은
+      화면 골격 문구뿐이다.
+  
+      CTA는 "목록으로 간다"가 아니라 "돌려본다"로 적는다. 이 사이트에서 목록이
+      값을 하는 지점이 브라우저 실행이고, 그걸 한 번의 클릭 거리에 두는 것이
+      이 버튼의 목적이다.
+    */
+    "about.cta": "바로 돌려보기 →",
     // 상태줄
     "status.preparing": "준비 중입니다…",
     "status.loading": "catalog-index.json을 불러오는 중입니다…",
@@ -71,6 +84,7 @@ export const koreanUiStrings = {
     "error.refreshCategory": "분류 결과를 갱신하지 못했습니다.",
     "error.switchListView": "목록 보기를 전환하지 못했습니다.",
     "error.switchCatalogScreen": "카탈로그 화면을 전환하지 못했습니다.",
+    "error.openAbout": "소개 화면을 열지 못했습니다.",
     "error.returnToList": "목록 화면으로 돌아가지 못했습니다.",
     "error.switchLanguage": "표시 언어를 전환하지 못했습니다.",
     "error.switchTheme": "테마를 전환하지 못했습니다.",
@@ -233,7 +247,8 @@ export const englishUiStrings = {
     "document.description": "SSW Algorithm Archive — guidance, contracts, tests, per-language sources and coverage status",
     "skipLink.toContent": "Skip to main content",
     "brand.tagline": "Algorithm catalog",
-    "sidebar.navLabel": "Catalog sections",
+    "sidebar.navLabel": "Site sections",
+    "sidebar.about": "About",
     "sidebar.groupLabel": "Catalog",
     "sidebar.list": "List",
     "sidebar.coverage": "Coverage",
@@ -241,9 +256,12 @@ export const englishUiStrings = {
     "topbar.languageGroup": "Display language",
     "topbar.darkMode": "Dark mode",
     // Screen names (top bar title)
+    "screen.about": "About",
     "screen.list": "Algorithm list",
     "screen.coverage": "Coverage matrix",
     "screen.fallback": "Algorithm catalog",
+    // About screen. The body is the repository README, so it stays in Korean.
+    "about.cta": "Run one now →",
     // Status line
     "status.preparing": "Getting ready…",
     "status.loading": "Loading catalog-index.json…",
@@ -265,6 +283,7 @@ export const englishUiStrings = {
     "error.refreshCategory": "Could not refresh the category results.",
     "error.switchListView": "Could not switch the list layout.",
     "error.switchCatalogScreen": "Could not switch the catalog view.",
+    "error.openAbout": "Could not open the about view.",
     "error.returnToList": "Could not return to the list view.",
     "error.switchLanguage": "Could not switch the display language.",
     "error.switchTheme": "Could not switch the theme.",
