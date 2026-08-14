@@ -157,7 +157,7 @@ test("빠지는 것은 그 구간 하나뿐이다", () => {
   assert.equal(readmeQuotes, 3, "README 의 인용 블록 수가 달라졌습니다.");
   assert.equal(pageQuotes, readmeQuotes - 1, "빠진 블록 수가 1개가 아닙니다.");
   for (const kept of [
-    "본체 구현과 콘텐츠",
+    "일회성 스냅샷",
     "덧붙이면 이 기능은 원래 계획에",
   ]) {
     assert.ok(page.includes(kept), `남아야 할 인용까지 빠졌습니다: ${kept}`);
