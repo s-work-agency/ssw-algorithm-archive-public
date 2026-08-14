@@ -19,6 +19,7 @@ import { fileURLToPath } from "node:url";
 const deployRoot = new URL("../../", import.meta.url);
 const readme = await readFile(fileURLToPath(new URL("README.md", deployRoot)), "utf8");
 const page = await readFile(fileURLToPath(new URL("index.html", deployRoot)), "utf8");
+const styles = await readFile(fileURLToPath(new URL("styles.css", deployRoot)), "utf8");
 
 const blobBase =
   "https://github.com/s-work-agency/ssw-algorithm-archive-public/blob/main/";
@@ -105,16 +106,57 @@ test("사이트 자기 주소는 그대로 두고 링크로 세운다", () => {
   assert.ok(page.includes(`href="${selfUrl}"`), "사이트 주소가 링크로 서지 않았습니다.");
 });
 
-test("mermaid 블록은 그리지 않고 코드 그대로 내보낸다", () => {
-  const fences = [...readme.matchAll(/^```mermaid$/gmu)].length;
-  assert.ok(fences > 0, "README 에 mermaid 블록이 없습니다.");
+/** README 의 mermaid 블록. 노드 정의 줄과 화살표 수가 곧 기대값이다. */
+const readmeDiagrams = [
+  ...readme.matchAll(/^```mermaid$\n([\s\S]*?)^```$/gmu),
+].map((matched) => {
+  const body = matched[1];
+  return {
+    nodes: [...body.matchAll(/^\s*[A-Za-z][A-Za-z0-9_]*\s*[[{]"/gmu)].length,
+    edges: [...body.matchAll(/-->/gu)].length,
+  };
+});
+
+/** 게시된 본문 안의 흐름도 SVG. 원본 블록과 하나씩 짝지어 센다. */
+const pageDiagrams = [
+  ...page.matchAll(/<svg class="doc-figure__svg"[\s\S]*?<\/svg>/gu),
+].map((matched) => {
+  const svg = matched[0];
+  return {
+    nodes: [...svg.matchAll(/class="doc-figure__box[" ]/gu)].length,
+    edges: [...svg.matchAll(/class="doc-figure__edge"/gu)].length,
+  };
+});
+
+test("mermaid 블록은 코드가 아니라 다이어그램으로 나간다", () => {
+  assert.ok(readmeDiagrams.length > 0, "README 에 mermaid 블록이 없습니다.");
   assert.equal(
-    [...page.matchAll(/data-language="mermaid"/gu)].length,
-    fences,
-    "mermaid 블록 수가 README 와 다릅니다.",
+    pageDiagrams.length,
+    readmeDiagrams.length,
+    "그려진 흐름도 수가 README 의 mermaid 블록 수와 다릅니다.",
   );
-  // 블록 안 <b> 는 문자로 나가야 한다. 태그로 새면 이스케이프가 뚫린 것이다.
-  assert.ok(page.includes("&lt;b&gt;"), "코드 블록 안 태그가 이스케이프되지 않았습니다.");
+  // 코드 블록으로 퇴행하면 여기서 잡힌다. 빌드가 먼저 죽어야 정상이지만,
+  // 게시된 결과에서도 한 번 더 본다.
+  assert.ok(
+    !page.includes('data-language="mermaid"'),
+    "mermaid 가 코드 블록으로 나갔습니다.",
+  );
+});
+
+test("흐름도의 노드 수·간선 수가 README 원본과 일치한다", () => {
+  for (const [index, expected] of readmeDiagrams.entries()) {
+    assert.deepEqual(
+      pageDiagrams[index],
+      expected,
+      `${index + 1}번째 흐름도의 노드·간선 수가 원본과 다릅니다.`,
+    );
+  }
+});
+
+test("흐름도는 자기 상자 안에서만 가로로 스크롤한다", () => {
+  // 페이지 전체가 옆으로 밀리면 안 된다. 스크롤 상자는 figure 가 든다.
+  assert.match(page, /<figure class="doc-figure">/u);
+  assert.match(styles, /\.doc-figure \{[^}]*overflow-x: auto/u);
 });
 
 test("소개 본문이 문서 조판 클래스를 달고 나온다", () => {
@@ -127,4 +169,15 @@ test("소개 본문이 문서 조판 클래스를 달고 나온다", () => {
   ]) {
     assert.ok(page.includes(marker), `본문에 ${marker} 가 없습니다.`);
   }
+});
+
+test("본문 컬럼과 CTA 가 카드 안에서 가운데로 놓인다", () => {
+  // 왼쪽에 붙여 두면 넓은 화면에서 오른쪽에만 큰 여백이 남는다.
+  assert.match(styles, /\.about-doc > \* \{[^}]*margin-inline: auto/u);
+  assert.match(styles, /\.about-panel__heading \{[^}]*margin-inline: auto/u);
+  // CTA 줄은 본문 컬럼과 같은 폭을 써야 버튼이 카드 구석으로 떠나지 않는다.
+  assert.match(
+    styles,
+    /\.about-panel__heading \{[^}]*width: min\(100%, var\(--doc-measure\)\)/u,
+  );
 });

@@ -26,6 +26,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { deployRoot } from "./deploy-paths.mjs";
 import { renderMarkdown } from "./markdown.mjs";
+import { renderFlowchartSvg } from "./mermaid.mjs";
 
 /** 배포된 셸에서 이 문자열 자리에 소개 본문이 들어간다. */
 const placeholder = "<!-- ABOUT-DOC -->";
@@ -79,13 +80,31 @@ function assertAnchorsResolve(stats) {
   );
 }
 
+/**
+ * mermaid 블록 → 인라인 SVG. 라이브러리를 실을 수 없다고 다이어그램을 코드
+ * 덩어리로 내보내지는 않는다. 대신 우리가 쓰는 문법만 읽어 빌드가 그림을 만든다.
+ *
+ * 미니 렌더러가 못 읽는 블록을 만나면 여기서 예외가 그대로 올라가 빌드가 죽는다.
+ * 조용히 코드 블록으로 떨구지 않는 것이 요점이다 — 나중에 README 의 다이어그램
+ * 문법이 넓어졌을 때, 그림이 소리 없이 글자로 퇴행하는 대신 빌드가 먼저 멈춘다.
+ */
+function createFlowchartRenderer(diagrams) {
+  return (code) => {
+    const { html, stats } = renderFlowchartSvg(code, { index: diagrams.length });
+    diagrams.push(stats);
+    return html;
+  };
+}
+
 async function main() {
   const counts = { anchors: 0, documents: 0 };
+  const diagrams = [];
   const { html, stats } = renderMarkdown(await readFile(readmePath, "utf8"), {
     rewriteHref: createHrefRewriter(counts),
     headingIdPrefix: anchorPrefix,
     // 화면 제목(h1)은 탑바가 이미 들고 있다. 본문은 h2부터 시작해야 개요가 맞는다.
     headingLevelOffset: 1,
+    fencedRenderers: { mermaid: createFlowchartRenderer(diagrams) },
   });
   assertAnchorsResolve(stats);
 
@@ -109,6 +128,18 @@ async function main() {
     `  코드 블록 ${stats.codeBlocks.length}개${
       stats.codeBlocks.length
         ? ` (${stats.codeBlocks.map((language) => language || "(언어 없음)").join(", ")})`
+        : ""
+    }`,
+  );
+  console.log(
+    `  다이어그램 ${diagrams.length}개${
+      diagrams.length
+        ? ` (${diagrams
+            .map(
+              (diagram) =>
+                `노드 ${diagram.nodes}·간선 ${diagram.edges}·${diagram.width}x${diagram.height}`,
+            )
+            .join(" / ")})`
         : ""
     }`,
   );

@@ -375,6 +375,16 @@ code {
   list-style: none;
 }
 
+/*
+  그룹 사이 간격. 소개는 카탈로그 그룹 밖 항목이라, 그룹 라벨이 바로 위 항목에
+  눌려 붙으면 둘이 한 덩어리로 읽힌다. 브랜드 아래·지표 위가 쓰는 1.1rem 리듬에
+  맞추되, 라벨이 자기 아래 목록에 붙어 보이도록 위쪽을 조금 더 벌린다
+  (라벨 자신의 아래 여백은 0.5rem 이다).
+*/
+.nav-list + .nav-label {
+  margin-top: 1.3rem;
+}
+
 .nav-link {
   display: block;
   padding: 0.6rem 0.7rem;
@@ -1875,16 +1885,27 @@ select:focus {
   다만 색·타이포·라운드는 새로 만들지 않고 기존 토큰만 쓴다 — 화면 하나가
   다른 사이트처럼 보이면 안 되고, 다크 전환도 토큰을 타야 저절로 따라온다.
 
-  본문 폭만 좁힌다. 표·코드 블록은 좁히면 오히려 읽기 어려워지므로 패널 폭을
-  그대로 쓰고, 넘치는 폭은 각자의 가로 스크롤이 받는다.
+  폭은 세 단이다. 산문은 읽기 좋은 폭(--doc-measure), 표·코드는 한 단 넓은
+  띠(--doc-wide), 가로로 긴 흐름도는 카드 폭 전체를 쓴다. 셋 다 카드 안에서
+  가운데로 놓는다 — 왼쪽에 붙여 두면 넓은 화면에서 오른쪽에만 큰 여백이 남아
+  글이 카드 구석으로 밀린 것처럼 보인다.
 */
 .about-panel {
   /* 한 줄에 한글 45자 안팎. 눈이 다음 줄 첫 글자를 놓치지 않는 폭이다. */
   --doc-measure: 46rem;
+  /* 표·코드가 쓰는 띠. 산문보다 넓되 카드 안에 머문다. */
+  --doc-wide: 60rem;
 }
 
+/*
+  제목 줄도 본문 컬럼에 맞춘다. CTA 를 카드 오른쪽 끝에 붙이면 글은 가운데 있고
+  버튼만 멀찍이 떠 있어 둘이 남남으로 읽힌다. 같은 컬럼 폭 안에서 좌우 끝을
+  잡아야 본문 첫 줄과 버튼이 같은 세로선 위에 선다.
+*/
 .about-panel__heading {
+  width: min(100%, var(--doc-measure));
   align-items: center;
+  margin-inline: auto;
   margin-bottom: 1.4rem;
 }
 
@@ -1944,13 +1965,25 @@ select:focus {
   outline-offset: 0.4rem;
 }
 
+/*
+  폭은 상자가 아니라 각 요소가 정한다. 산문은 읽기 폭, 표·코드는 한 단 넓은 띠,
+  흐름도는 카드 폭 전체다. 셋 다 margin-inline: auto 로 가운데에 선다.
+*/
 .about-doc > * {
   max-width: var(--doc-measure);
+  margin-inline: auto;
 }
 
-/* 표·코드는 읽기 폭을 넘겨도 된다. 넘치는 폭은 각자 안에서 스크롤된다. */
 .about-doc > .table-wrap,
 .about-doc > .doc-code {
+  max-width: var(--doc-wide);
+}
+
+/*
+  흐름도는 가로로 긴 그림이라 카드가 주는 폭을 다 쓴다. 그래도 모자라면 자기
+  상자 안에서 스크롤한다.
+*/
+.about-doc > .doc-figure {
   max-width: none;
 }
 
@@ -2081,10 +2114,8 @@ select:focus {
 }
 
 /*
-  코드 블록. 이 사이트에는 mermaid 를 그릴 라이브러리가 없다(외부 호스트 요청이
-  막혀 있다). 그래서 다이어그램 블록도 그림으로 세우지 않고 코드 그대로 내보내고,
-  무엇으로 적힌 코드인지는 오른쪽 위 언어 표시가 알린다. 코드면은 상세 화면의
-  소스 블록과 같은 --surface-code 라 양 테마에서 같은 면을 쓴다.
+  코드 블록. 무엇으로 적힌 코드인지는 오른쪽 위 언어 표시가 알린다. 코드면은
+  상세 화면의 소스 블록과 같은 --surface-code 라 양 테마에서 같은 면을 쓴다.
 */
 .about-doc .doc-code {
   position: relative;
@@ -2107,6 +2138,74 @@ select:focus {
   font-weight: 700;
   letter-spacing: 0.04em;
   content: attr(data-language);
+}
+
+/*
+  흐름도. mermaid 블록을 빌드가 인라인 SVG로 옮긴 것이라, 브라우저가 받는 것은
+  이미 완성된 그림이고 실행되는 코드는 없다(scripts/mermaid.mjs).
+
+  SVG는 자연 크기로 둔다. 폭에 맞춰 줄이면 글자가 같이 작아져 읽을 수 없게 되므로,
+  좁은 화면에서는 이 상자 안에서만 가로로 스크롤한다 — 코드 블록·표가 이미 쓰는
+  방식과 같다. 색은 전부 클래스로 빼서 토큰을 타므로 다크 전환도 함께 따라온다.
+*/
+.doc-figure {
+  overflow-x: auto;
+  margin: 0 0 1.4rem;
+  padding: 1.1rem 0.2rem;
+}
+
+.doc-figure__svg {
+  display: block;
+  margin-inline: auto;
+}
+
+.doc-figure__box {
+  fill: var(--surface-card);
+  stroke: var(--line-accent);
+  stroke-width: 1;
+}
+
+/* 판단 노드는 좌우가 깎인 육각형이라 면을 한 단 눌러 상자와 갈린다. */
+.doc-figure__box--decision {
+  fill: var(--accent-tint);
+  stroke: var(--accent-border);
+}
+
+.doc-figure__text {
+  fill: var(--text-muted);
+  font-family: var(--font-sans);
+}
+
+.doc-figure__text--title {
+  fill: var(--text-heading);
+}
+
+.doc-figure__text--bold {
+  font-weight: 750;
+}
+
+.doc-figure__edge {
+  fill: none;
+  stroke: var(--line-control);
+  stroke-width: 1.6;
+}
+
+.doc-figure__arrowhead {
+  fill: var(--line-control);
+}
+
+/* 간선 라벨은 선 위에 앉으므로 면을 한 겹 깔아 글자가 선에 뚫리지 않게 한다. */
+.doc-figure__edge-chip {
+  fill: var(--surface-card);
+  stroke: var(--line-panel);
+  stroke-width: 1;
+}
+
+.doc-figure__edge-label {
+  fill: var(--text-subtle);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 /* ≤820px: 사이드바를 슬라이드 드로어로 전환한다. */

@@ -120,14 +120,37 @@ test("구분선은 표 구분 행과 갈린다", () => {
 });
 
 test("코드 블록은 원문 그대로 이스케이프하고 언어만 표시로 남긴다", () => {
-  // mermaid 도 그림으로 세우지 않는다 — 그릴 라이브러리를 들일 수 없다.
   const { html, stats } = renderMarkdown(
-    '```mermaid\nflowchart LR\n    C["<b>계약</b>"]\n```\n',
+    '```json\n{"a": "<b>"}\n```\n',
   );
-  assert.match(html, /<pre class="doc-code" data-language="mermaid"><code>/u);
-  assert.match(html, /&lt;b&gt;계약&lt;\/b&gt;/u);
+  assert.match(html, /<pre class="doc-code" data-language="json"><code>/u);
+  assert.match(html, /&lt;b&gt;/u);
   assert.doesNotMatch(html, /<b>/u);
-  assert.deepEqual(stats.codeBlocks, ["mermaid"]);
+  assert.deepEqual(stats.codeBlocks, ["json"]);
+});
+
+test("언어 전용 렌더러가 등록되면 코드 블록 대신 그쪽이 그린다", () => {
+  // 다이어그램처럼 그림으로 세워야 하는 블록이 이 길로 빠진다.
+  const html = render("```mermaid\nflowchart LR\n```\n", {
+    fencedRenderers: { mermaid: (code) => `<figure>${code.trim()}</figure>` },
+  });
+  assert.equal(html, "<figure>flowchart LR</figure>");
+  assert.doesNotMatch(html, /<pre/u);
+});
+
+test("언어 전용 렌더러가 세우면 그대로 올려 보낸다", () => {
+  // 삼키면 그려야 할 것이 코드 블록으로 조용히 퇴행한다. 빌드가 멈춰야 한다.
+  assert.throws(
+    () =>
+      render("```mermaid\n못 읽는 것\n```\n", {
+        fencedRenderers: {
+          mermaid: () => {
+            throw new Error("읽을 수 없는 mermaid 문법입니다");
+          },
+        },
+      }),
+    /읽을 수 없는 mermaid 문법입니다/u,
+  );
 });
 
 test("원문 HTML 은 문자로 내보낸다", () => {

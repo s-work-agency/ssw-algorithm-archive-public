@@ -17,8 +17,8 @@
  *   README에 없어 다루지 않는다.
  * - 표(헤더 행 + `---` 구분 행). 정렬 지정(`:---`)은 구문만 받아 주고 실제
  *   정렬은 걸지 않는다 — README가 쓰지 않는다.
- * - 코드 블록(``` 울타리). 언어 이름은 data-language로만 남긴다. mermaid도
- *   그림으로 세우지 않고 코드 그대로 내보낸다(외부 라이브러리 금지).
+ * - 코드 블록(``` 울타리). 언어 이름은 data-language로만 남긴다. 언어별로 다르게
+ *   그려야 하는 것(mermaid 다이어그램)은 fencedRenderers로 부르는 쪽이 넘긴다.
  * - 구분선(`---`).
  * - 인라인: `` `코드` ``, `**굵게**`, `[라벨](주소)`, 맨 URL 자동 링크.
  *
@@ -172,8 +172,15 @@ function startsNewBlock(lines, index) {
   return line.includes("|") && isTableDelimiter(lines[index + 1] ?? "");
 }
 
+/**
+ * 울타리 블록. 언어 전용 렌더러가 등록돼 있으면 그쪽이 이기고, 없으면 코드로
+ * 내보낸다. 렌더러가 세우는 예외는 삼키지 않고 그대로 올린다 — 그려야 할 것이
+ * 코드 블록으로 조용히 퇴행하는 것을 막는 장치라, 여기서 잡으면 뜻이 없다.
+ */
 function renderCodeBlock(code, language, context) {
   context.stats.codeBlocks.push(language);
+  const renderer = language ? context.fencedRenderers[language] : undefined;
+  if (renderer) return renderer(code, language);
   const attribute = language ? ` data-language="${escapeHtml(language)}"` : "";
   return `<pre class="doc-code"${attribute}><code>${escapeHtml(code)}</code></pre>`;
 }
@@ -327,6 +334,8 @@ function renderBlocks(lines, context) {
  * - `headingIdPrefix` — 제목 앵커 id 앞에 붙는 말. 라우팅과 섞이지 않게 하려고
  *   둔다.
  * - `headingLevelOffset` — 제목 레벨을 내리는 칸수. 화면에 이미 h1이 있으면 1.
+ * - `fencedRenderers` — 언어 이름 → 그 울타리 블록을 그리는 함수. 등록된 언어는
+ *   코드 블록 대신 이쪽이 그린다.
  *
  * 돌려주는 stats는 부르는 쪽이 검증에 쓴다(앵커가 실제 제목을 가리키는지 등).
  */
@@ -335,6 +344,7 @@ export function renderMarkdown(markdown, options = {}) {
     rewriteHref: options.rewriteHref ?? ((href) => href),
     headingIdPrefix: options.headingIdPrefix ?? "",
     headingLevelOffset: options.headingLevelOffset ?? 0,
+    fencedRenderers: options.fencedRenderers ?? {},
     usedSlugs: new Set(),
     stats: { headings: [], links: [], codeBlocks: [] },
   };
