@@ -1564,22 +1564,19 @@ select:focus {
 }
 
 /*
-  구현 탭의 코드 비교 표(언어·상태·공식 벡터 검증·기본 테스트 검증·
-  엔트리포인트·소스·기본 테스트 소스)는 엔트리포인트와 소스 경로가 길어
-  auto 레이아웃이 남은 열을 한계까지 눌러 버린다. 값이 짧은 앞 4열은 아예
-  줄바꿈을 막아 자연 폭을 확보하고, 넘치는 폭은 .table-wrap 의 가로
-  스크롤이 받는다. 계약·예시 표(.contract-table)와 커버리지 표는 열 구성이
-  달라 제외한다. 26차에 상세가 탭형으로 통일되면서 같은 표를 그리던
-  #compare-content 쪽 짝은 갈 곳이 없어져 걷어냈다.
+  구현 탭의 코드 비교 표(언어·상태·공식 벡터 검증·엔트리포인트·소스)는
+  엔트리포인트와 소스 경로가 길어 auto 레이아웃이 남은 열을 한계까지 눌러
+  버린다. 값이 짧은 앞 3열은 아예 줄바꿈을 막아 자연 폭을 확보하고, 넘치는
+  폭은 .table-wrap 의 가로 스크롤이 받는다. 계약·예시 표(.contract-table)와
+  커버리지 표는 열 구성이 달라 제외한다. 26차에 상세가 탭형으로 통일되면서
+  같은 표를 그리던 #compare-content 쪽 짝은 갈 곳이 없어져 걷어냈다.
 */
 .spec-panel .data-table:not(.contract-table) th:nth-child(1),
 .spec-panel .data-table:not(.contract-table) td:nth-child(1),
 .spec-panel .data-table:not(.contract-table) th:nth-child(2),
 .spec-panel .data-table:not(.contract-table) td:nth-child(2),
 .spec-panel .data-table:not(.contract-table) th:nth-child(3),
-.spec-panel .data-table:not(.contract-table) td:nth-child(3),
-.spec-panel .data-table:not(.contract-table) th:nth-child(4),
-.spec-panel .data-table:not(.contract-table) td:nth-child(4) {
+.spec-panel .data-table:not(.contract-table) td:nth-child(3) {
   white-space: nowrap;
 }
 

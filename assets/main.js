@@ -1684,7 +1684,6 @@ function main() {
             t("compare.columnLanguage"),
             t("compare.columnStatus"),
             t("compare.columnVectorVerification"),
-            t("compare.columnBasicTestVerification"),
             t("compare.columnEntryPoint"),
             t("compare.columnSource"),
         ].forEach((label) => {
@@ -1700,17 +1699,11 @@ function main() {
             const group = sourceGroupForLanguage(catalog, language);
             const bundled = isBundledSource(catalog, language);
             const vectorSummary = legacyVectorVerification(language);
-            const basicVerification = catalog.schemaVersion === "2.0"
-                ? language.basicTestVerification
-                    ? verificationSummaryText(language.basicTestVerification)
-                    : t("compare.planned")
-                : t("compare.notApplicable");
             const tr = element("tr");
             [
                 language.language,
                 implementationStatusText(language.implementationStatus),
                 verificationSummaryText(vectorSummary),
-                basicVerification,
                 language.entryPoint,
                 // 번들 통짜의 경로는 열람 안내가 되지 못하므로 아예 싣지 않는다.
                 bundled
