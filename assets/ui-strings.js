@@ -31,9 +31,12 @@ export const koreanUiStrings = {
     "document.description": "설명·계약·테스트·언어별 원본 코드와 커버리지 현황을 제공하는 SSW Algorithm Archive",
     "skipLink.toContent": "본문으로 건너뛰기",
     "brand.tagline": "알고리즘 카탈로그",
-    // 소개가 카탈로그 밖 항목으로 들어오면서 이 nav 는 카탈로그 영역만 담지 않는다.
+    // 읽을거리(소개·생각)가 카탈로그 밖 항목으로 들어오면서 이 nav 는 카탈로그
+    // 영역만 담지 않는다.
     "sidebar.navLabel": "사이트 영역",
     "sidebar.about": "소개",
+    // 네비 라벨은 짧게 두고, 글의 제목은 탑바가 든다(screen.thoughts).
+    "sidebar.thoughts": "생각",
     "sidebar.groupLabel": "카탈로그",
     "sidebar.list": "목록",
     "sidebar.coverage": "커버리지",
@@ -42,6 +45,11 @@ export const koreanUiStrings = {
     "topbar.darkMode": "다크 모드",
     // 화면 이름 (탑바 제목)
     "screen.about": "소개",
+    /*
+      생각 화면만 탑바가 글의 제목을 그대로 든다. 본문에 제목을 한 번 더 두면 같은
+      문장이 두 번 찍히므로, 사본에서는 문서 제목을 빼고 이 자리로 올렸다.
+    */
+    "screen.thoughts": "알고리즘이라는 것",
     "screen.list": "알고리즘 목록",
     "screen.coverage": "커버리지 매트릭스",
     "screen.fallback": "알고리즘 카탈로그",
@@ -85,6 +93,7 @@ export const koreanUiStrings = {
     "error.switchListView": "목록 보기를 전환하지 못했습니다.",
     "error.switchCatalogScreen": "카탈로그 화면을 전환하지 못했습니다.",
     "error.openAbout": "소개 화면을 열지 못했습니다.",
+    "error.openThoughts": "생각 화면을 열지 못했습니다.",
     "error.returnToList": "목록 화면으로 돌아가지 못했습니다.",
     "error.switchLanguage": "표시 언어를 전환하지 못했습니다.",
     "error.switchTheme": "테마를 전환하지 못했습니다.",
@@ -249,6 +258,7 @@ export const englishUiStrings = {
     "brand.tagline": "Algorithm catalog",
     "sidebar.navLabel": "Site sections",
     "sidebar.about": "About",
+    "sidebar.thoughts": "Thoughts",
     "sidebar.groupLabel": "Catalog",
     "sidebar.list": "List",
     "sidebar.coverage": "Coverage",
@@ -257,6 +267,8 @@ export const englishUiStrings = {
     "topbar.darkMode": "Dark mode",
     // Screen names (top bar title)
     "screen.about": "About",
+    // The essay itself is Korean; this is the screen skeleton only.
+    "screen.thoughts": "Thoughts on algorithms",
     "screen.list": "Algorithm list",
     "screen.coverage": "Coverage matrix",
     "screen.fallback": "Algorithm catalog",
@@ -284,6 +296,7 @@ export const englishUiStrings = {
     "error.switchListView": "Could not switch the list layout.",
     "error.switchCatalogScreen": "Could not switch the catalog view.",
     "error.openAbout": "Could not open the about view.",
+    "error.openThoughts": "Could not open the thoughts view.",
     "error.returnToList": "Could not return to the list view.",
     "error.switchLanguage": "Could not switch the display language.",
     "error.switchTheme": "Could not switch the theme.",
