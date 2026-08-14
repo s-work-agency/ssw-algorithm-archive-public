@@ -118,6 +118,47 @@ test("스크린리더용 설명에 흐름이 글로 들어간다", () => {
   assert.match(html, /기대값과 같은가 → 통과 \(같음\)/u);
 });
 
+test("상자마다 실제 크기가 박히고 층별로 폭이 갈린다", () => {
+  const { html } = renderFlowchartSvg(branching);
+  const rects = [...html.matchAll(/<rect class="doc-figure__box"([^>]*)\/>/gu)];
+  assert.equal(rects.length, 3);
+  for (const [, attributes] of rects) {
+    const width = Number(/width="([^"]*)"/u.exec(attributes)[1]);
+    const height = Number(/height="([^"]*)"/u.exec(attributes)[1]);
+    assert.ok(Number.isFinite(width) && width > 0, `폭: ${width}`);
+    assert.ok(Number.isFinite(height) && height > 0, `높이: ${height}`);
+  }
+  // 같은 층에 쌓인 갈래(P·F)는 좌우 끝이 맞아야 하므로 폭이 같다.
+  const stacked = rects
+    .map(([, a]) => Number(/width="([^"]*)"/u.exec(a)[1]))
+    .slice(1);
+  assert.equal(new Set(stacked).size, 1, "같은 층의 폭이 어긋났습니다.");
+});
+
+test("층마다 상자 폭이 갈린다", () => {
+  // 하나로 통일하면 짧은 상자가 최장 라벨에 맞춰 넓어지고, 그 낭비가 층 수만큼
+  // 곱해져 그림이 문서 띠를 넘는다.
+  const widths = [
+    ...renderFlowchartSvg(chain).html.matchAll(
+      /<rect class="doc-figure__box"[^>]*width="([^"]*)"/gu,
+    ),
+  ].map((matched) => Number(matched[1]));
+  assert.equal(widths.length, 3);
+  assert.ok(new Set(widths).size > 1, "층별 폭이 갈리지 않았습니다.");
+});
+
+test("수가 아닌 좌표는 직렬화되지 않고 빌드를 세운다", () => {
+  /*
+    회귀 그대로다. 상자 폭을 읽던 자리가 빗나가 width="undefined" 가 나갔고,
+    SVG 는 그 도형만 조용히 건너뛰어 상자가 사라졌다. 좌표를 쓰는 길목에서
+    막는다 — mermaid 문법 fail-closed 와 같은 원칙이다.
+  */
+  assert.throws(
+    () => renderFlowchartSvg(chain, { index: Number.NaN }),
+    /수가 아닌 값이 직렬화됐습니다|도형 좌표가 수가 아닙니다/u,
+  );
+});
+
 test("받지 않는 문법에서는 반드시 세운다", () => {
   const cases = [
     // 방향이 다른 머리줄

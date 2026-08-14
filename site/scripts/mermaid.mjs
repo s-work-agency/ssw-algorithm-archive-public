@@ -336,10 +336,17 @@ export function layoutFlowchart(chart) {
   return { boxes, edges: chart.edges, width, height, nodeHeight };
 }
 
-function nodeOutline(box, width, height) {
-  const { x, y } = box;
+/**
+ * 노드 한 칸의 외곽선. 폭·높이는 배치가 상자에 적어 둔 값을 그대로 읽는다.
+ *
+ * 예전에는 이 값을 layout 전역에서 받았는데, 상자 폭이 층별로 갈리면서 그 전역이
+ * 없어졌다. 부르는 쪽이 없는 값을 넘겨도 문법 오류가 아니라 width="undefined"로
+ * 조용히 직렬화됐고, 상자가 통째로 사라졌다. 그래서 폭을 바깥에서 받지 않는다.
+ */
+function nodeOutline(box) {
+  const { x, y, width, height } = box;
   if (box.node.shape !== "decision") {
-    return `<rect class="doc-figure__box" x="${x}" y="${y}" width="${width}" height="${height}" rx="10" />`;
+    return `<rect class="doc-figure__box" x="${round(x)}" y="${round(y)}" width="${round(width)}" height="${round(height)}" rx="10" />`;
   }
   const cut = metrics.decisionCut;
   const middle = y + height / 2;
@@ -357,7 +364,22 @@ function nodeOutline(box, width, height) {
   return `<path class="doc-figure__box doc-figure__box--decision" d="${path} Z" />`;
 }
 
-const round = (value) => Math.round(value * 100) / 100;
+/**
+ * 마크업에 들어가는 좌표 하나. 수가 아니면 여기서 세운다.
+ *
+ * SVG는 속성값이 틀려도 문서를 거절하지 않는다. width="undefined"는 그냥 그 도형을
+ * 그리지 않고 넘어가고, NaN 좌표는 path 하나를 지운다. 화면에서는 상자와 선이
+ * 소리 없이 사라질 뿐이라 빌드도 테스트도 아무 말을 하지 않았다. mermaid 문법을
+ * fail-closed 로 잠근 것과 같은 이유로, 깨진 좌표가 직렬화되는 경로를 여기서 끊는다.
+ */
+function round(value, what = "좌표") {
+  if (!Number.isFinite(value)) {
+    throw new Error(
+      `도형 좌표가 수가 아닙니다 (${what}): ${String(value)}. 배치 계산을 확인하세요.`,
+    );
+  }
+  return Math.round(value * 100) / 100;
+}
 
 /** 노드 이름. 보조 설명이 노드를 부를 때 쓰는 말이라 첫 줄을 그대로 쓴다. */
 const nodeName = (node) => node.lines[0].text;
@@ -401,7 +423,7 @@ export function renderFlowchartSvg(source, options = {}) {
     });
     return [
       "<g>",
-      nodeOutline(box, layout.nodeWidth, layout.nodeHeight),
+      nodeOutline(box),
       ...texts,
       "</g>",
     ].join("\n");
@@ -422,7 +444,7 @@ export function renderFlowchartSvg(source, options = {}) {
       자연 크기의 minScale 까지만 줄이고, 그 아래에서는 상자 안에서 스크롤한다.
       하한은 다이어그램마다 다르므로 여기서 계산해 인라인으로 싣는다.
     */
-    `<svg class="doc-figure__svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeHtml(description)}" viewBox="0 0 ${layout.width} ${layout.height}" width="${layout.width}" height="${layout.height}" style="min-width: ${Math.round(layout.width * metrics.minScale)}px">`,
+    `<svg class="doc-figure__svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeHtml(description)}" viewBox="0 0 ${round(layout.width, "그림 너비")} ${round(layout.height, "그림 높이")}" width="${round(layout.width, "그림 너비")}" height="${round(layout.height, "그림 높이")}" style="min-width: ${round(layout.width * metrics.minScale, "축소 하한")}px">`,
     `<desc>${escapeHtml(description)}</desc>`,
     "<defs>",
     `<marker id="${markerId}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">`,
@@ -433,6 +455,18 @@ export function renderFlowchartSvg(source, options = {}) {
     ...nodeGroups,
     "</svg>",
   ].join("\n");
+
+  /*
+    좌표 하나하나는 round가 이미 봤다. 여기서 한 번 더 훑는 것은 그 길을 타지 않는
+    값(리터럴, 문자열 조립, 나중에 붙는 속성)까지 덮기 위해서다. 깨진 SVG는 브라우저가
+    조용히 일부만 그리고 넘어가므로, 내보내기 전에 여기서 멈추는 편이 낫다.
+  */
+  const broken = /\b(?:undefined|NaN)\b/u.exec(svg);
+  if (broken) {
+    throw new Error(
+      `그림에 수가 아닌 값이 직렬화됐습니다: ${broken[0]}. 배치 계산을 확인하세요.`,
+    );
+  }
 
   return {
     html: `<figure class="doc-figure">\n${svg}\n</figure>`,

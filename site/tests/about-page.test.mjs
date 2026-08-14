@@ -174,6 +174,98 @@ test("mermaid 블록은 코드가 아니라 다이어그램으로 나간다", ()
   );
 });
 
+test("흐름도 SVG 에 수가 아닌 좌표가 없다", () => {
+  /*
+    붙잡는 회귀: 상자 폭을 층별로 바꾸면서 폭을 읽던 자리가 빗나가
+    width="undefined" 로 직렬화되던 것. SVG 는 속성값이 틀려도 문서를 거절하지
+    않고 그 도형만 조용히 건너뛴다. 그래서 노드 수·간선 수를 세는 검사는 그대로
+    통과했고(요소는 다 있었다) 화면에서는 상자와 선이 사라졌다.
+
+    개수가 아니라 좌표를 본다.
+  */
+  const svgs = [...page.matchAll(/<svg class="doc-figure__svg"[\s\S]*?<\/svg>/gu)]
+    .map((matched) => matched[0]);
+  assert.ok(svgs.length > 0, "그림이 없습니다.");
+  for (const [index, svg] of svgs.entries()) {
+    const broken = /\b(?:undefined|NaN)\b/u.exec(svg);
+    assert.equal(
+      broken,
+      null,
+      `${index + 1}번째 그림에 ${broken?.[0]} 이 직렬화됐습니다.`,
+    );
+  }
+});
+
+test("흐름도의 상자마다 실제 크기가 박혀 있다", () => {
+  const rects = [...page.matchAll(/<rect class="doc-figure__box"([^>]*)\/>/gu)];
+  assert.ok(rects.length >= 11, "상자를 읽지 못했습니다.");
+  for (const [, attributes] of rects) {
+    for (const name of ["x", "y", "width", "height"]) {
+      const value = new RegExp(`${name}="([^"]*)"`, "u").exec(attributes)?.[1];
+      const number = Number(value);
+      assert.ok(
+        Number.isFinite(number),
+        `상자 ${name} 이 수가 아닙니다: ${value}`,
+      );
+      if (name === "width" || name === "height") {
+        assert.ok(number > 0, `상자 ${name} 이 0 이하입니다: ${value}`);
+      }
+    }
+  }
+  // 판단 노드는 육각형이라 path 로 나간다. 좌표가 전부 수여야 한다.
+  for (const [, path] of page.matchAll(
+    /class="doc-figure__box doc-figure__box--decision" d="([^"]*)"/gu,
+  )) {
+    for (const token of path.match(/-?\d+(?:\.\d+)?|[A-Za-z]+/gu) ?? []) {
+      if (/^[A-Za-z]+$/u.test(token)) continue;
+      assert.ok(Number.isFinite(Number(token)), `판단 노드 좌표: ${token}`);
+    }
+  }
+});
+
+test("흐름도가 쓰는 클래스에 면과 선이 실제로 걸려 있다", () => {
+  /*
+    좌표가 멀쩡해도 색 규칙이 없으면 상자는 보이지 않는다. 클래스 이름만 붙어
+    있는지가 아니라, 그 클래스에 fill·stroke 가 선언돼 있고 참조하는 토큰이
+    실존하는지까지 본다.
+  */
+  const required = {
+    "doc-figure__box": ["fill", "stroke"],
+    "doc-figure__box--decision": ["fill", "stroke"],
+    "doc-figure__edge": ["stroke"],
+    "doc-figure__arrowhead": ["fill"],
+    "doc-figure__text": ["fill"],
+  };
+  for (const [className, properties] of Object.entries(required)) {
+    assert.ok(
+      page.includes(`class="doc-figure__box doc-figure__box--decision"`) ||
+        className !== "doc-figure__box--decision",
+      "판단 노드 클래스가 화면에 없습니다.",
+    );
+    const rule = new RegExp(
+      `\\.${className.replace(/--/gu, "--")}\\s*\\{([^}]*)\\}`,
+      "u",
+    ).exec(styles);
+    assert.ok(rule, `styles.css 에 .${className} 규칙이 없습니다.`);
+    for (const property of properties) {
+      const declaration = new RegExp(`(^|;|\\s)${property}:\\s*([^;]+)`, "u").exec(
+        rule[1],
+      );
+      assert.ok(
+        declaration,
+        `.${className} 에 ${property} 선언이 없습니다.`,
+      );
+      // var(--토큰)을 쓰면 그 토큰이 실제로 정의돼 있어야 한다.
+      const token = /var\((--[a-z0-9-]+)\)/u.exec(declaration[2]);
+      if (!token) continue;
+      assert.ok(
+        new RegExp(`${token[1]}:\\s*[^;]+;`, "u").test(styles),
+        `${token[1]} 토큰이 정의돼 있지 않습니다 (.${className} ${property}).`,
+      );
+    }
+  }
+});
+
 test("흐름도의 노드 수·간선 수가 README 원본과 일치한다", () => {
   for (const [index, expected] of readmeDiagrams.entries()) {
     assert.deepEqual(
