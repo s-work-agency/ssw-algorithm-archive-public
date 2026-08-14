@@ -180,6 +180,46 @@ test("흐름도는 자기 상자 안에서만 가로로 스크롤한다", () => 
   assert.match(styles, /\.doc-figure \{[^}]*overflow-x: auto/u);
 });
 
+test("흐름도 노드 라벨이 README 원문 그대로 그려진다", () => {
+  // 라벨은 README 의 mermaid 블록이 정본이다. 산출물만 고치면 GitHub 렌더와
+  // 어긋나므로, 원문에 있는 문구가 그림에도 있는지 짝지어 본다.
+  const labels = [...readme.matchAll(/^\s*[A-Za-z][A-Za-z0-9_]*\s*[[{]"([^"]*)"/gmu)]
+    .map((matched) => matched[1])
+    .flatMap((label) => label.split(/<br\s*\/?>/iu))
+    .map((line) => line.replace(/<\/?b>/giu, "").trim())
+    .filter(Boolean);
+  assert.ok(labels.length >= 13, "README 에서 노드 라벨을 읽지 못했습니다.");
+  for (const label of labels) {
+    // 긴 줄은 그림 안에서 접히므로 낱말 단위로 확인한다.
+    for (const word of label.split(" ")) {
+      assert.ok(
+        page.includes(word),
+        `노드 라벨이 그림에 없습니다: ${label} (${word})`,
+      );
+    }
+  }
+});
+
+test("표는 본문 컬럼 폭에 맞춰 서고 남는 폭은 마지막 열이 받는다", () => {
+  // README 의 표가 하나도 빠지지 않고 같은 조판을 받아야 한다.
+  const readmeTables = readme
+    .split("\n")
+    .filter((line) => /^\|[\s:|-]+$/u.test(line) && line.includes("---")).length;
+  const pageTables = [...page.matchAll(/class="data-table doc-table"/gu)].length;
+  assert.ok(readmeTables > 0, "README 에 표가 없습니다.");
+  assert.equal(pageTables, readmeTables, "표 수가 README 와 다릅니다.");
+  // 표만 더 넓으면 짧은 표가 그 폭을 못 채워 설명 열 뒤로 빈 자리가 남는다.
+  assert.match(
+    styles,
+    /\.about-doc > \.table-wrap \{[^}]*max-width: var\(--doc-measure\)/u,
+  );
+  assert.match(styles, /\.doc-table \{[^}]*min-width: 0/u);
+  assert.match(
+    styles,
+    /\.doc-table th:not\(:last-child\),\s*\.doc-table td:not\(:last-child\) \{[^}]*width: 1%/u,
+  );
+});
+
 test("소개 본문이 문서 조판 클래스를 달고 나온다", () => {
   for (const marker of [
     'class="doc-quote"',
