@@ -17,25 +17,28 @@ import { renderMarkdown, slugify } from "../scripts/markdown.mjs";
 const render = (markdown, options) => renderMarkdown(markdown, options).html;
 
 test("제목은 레벨을 내려 쓰고 GitHub 규칙의 앵커를 단다", () => {
-  const { html, stats } = renderMarkdown("# 제목\n\n## 1. 가볍게 시작했다\n", {
+  const { html, stats } = renderMarkdown("# 제목\n\n## 1. 가볍게 시작했습니다\n", {
     headingLevelOffset: 1,
     headingIdPrefix: "about/",
   });
   assert.match(html, /<h2 id="about\/제목">제목<\/h2>/u);
   assert.match(
     html,
-    /<h3 id="about\/1-가볍게-시작했다">1\. 가볍게 시작했다<\/h3>/u,
+    /<h3 id="about\/1-가볍게-시작했습니다">1\. 가볍게 시작했습니다<\/h3>/u,
   );
   assert.deepEqual(
     stats.headings.map((heading) => heading.id),
-    ["about/제목", "about/1-가볍게-시작했다"],
+    ["about/제목", "about/1-가볍게-시작했습니다"],
   );
 });
 
 test("앵커 slug 는 문장부호를 버리고 공백을 하이픈으로 바꾼다", () => {
-  // README 의 절 링크(#5-우선은-5000에서-멈춘다)가 이 규칙으로 만들어져 있다.
-  assert.equal(slugify("5. 우선은 5,000에서 멈춘다"), "5-우선은-5000에서-멈춘다");
-  assert.equal(slugify("6. 그래서 이 사이트에 담긴 것"), "6-그래서-이-사이트에-담긴-것");
+  // README 의 절 링크(#5-우선은-5000에서-멈춥니다)가 이 규칙으로 만들어져 있다.
+  assert.equal(slugify("5. 우선은 5,000에서 멈춥니다"), "5-우선은-5000에서-멈춥니다");
+  assert.equal(
+    slugify("6. 그래서 이 사이트에 이것을 담았습니다"),
+    "6-그래서-이-사이트에-이것을-담았습니다",
+  );
 });
 
 test("문단 안 줄바꿈은 공백으로 이어 붙인다", () => {
