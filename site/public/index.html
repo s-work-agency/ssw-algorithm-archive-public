@@ -53,10 +53,10 @@
 
       <aside class="sidebar" id="sidebar">
         <!--
-          브랜드는 사이트 홈(목록 화면) 링크다. 아래 nav 는 카탈로그 영역 이동만
+          브랜드는 사이트 홈(소개 화면) 링크다. 아래 nav 는 화면 이동만
           담당하므로 홈 링크는 nav 밖 앵커로 두고 aria-current 도 붙이지 않는다.
         -->
-        <a class="brand" id="brand-home" href="#list">
+        <a class="brand" id="brand-home" href="#about">
           <span class="brand__mark" aria-hidden="true">SA</span>
           <span class="brand__text">
             <!-- 서비스 이름은 고유명사라 로케일을 타지 않는다. -->
@@ -75,8 +75,24 @@
         <nav
           class="sidebar-nav"
           data-i18n-aria-label="sidebar.navLabel"
-          aria-label="카탈로그 영역"
+          aria-label="사이트 영역"
         >
+          <!--
+            소개는 카탈로그 영역이 아니라 사이트 첫 화면이라 그룹 라벨 밖 맨 위에
+            둔다. 기본 화면이 소개라 JS 로드 전에도 활성 표시가 맞다.
+          -->
+          <ul class="nav-list">
+            <li>
+              <a
+                id="nav-about"
+                class="nav-link"
+                href="#about"
+                aria-current="page"
+                data-i18n="sidebar.about"
+                >소개</a
+              >
+            </li>
+          </ul>
           <p
             class="nav-label"
             id="nav-label-catalog"
@@ -85,13 +101,11 @@
             카탈로그
           </p>
           <ul class="nav-list" aria-labelledby="nav-label-catalog">
-            <!-- 기본 화면이 목록이라 JS 로드 전에도 활성 표시가 맞다. -->
             <li>
               <a
                 id="catalog-tab-list"
                 class="nav-link"
                 href="#list"
-                aria-current="page"
                 data-i18n="sidebar.list"
                 >목록</a
               >
@@ -143,8 +157,8 @@
               >메뉴 열기</span
             >
           </button>
-          <h1 id="screen-title" class="topbar__title" data-i18n="screen.list">
-            알고리즘 목록
+          <h1 id="screen-title" class="topbar__title" data-i18n="screen.about">
+            소개
           </h1>
           <div class="topbar__actions">
             <!--
@@ -193,8 +207,37 @@
           </div>
         </header>
 
-        <main id="main-content" class="content">
-          <div id="catalog-screen">
+        <main id="main-content" class="content" tabindex="-1">
+          <!--
+            소개는 첫 화면이다. 본문은 빌드가 README.md 를 옮겨 아래 자리표시자
+            자리에 끼워 넣는다(scripts/build-about.mjs). 원본은 저장소 루트의
+            README.md 하나뿐이라, 여기 소스에는 문서 사본을 두지 않는다.
+
+            id 는 셸이 들고 생성 본문은 그 안에만 들어간다. main.js 가 잡는 것도
+            이 셸 쪽 id 라, 본문 제목이 바뀌어도 화면 코드가 흔들리지 않는다.
+          -->
+          <section
+            id="about-panel"
+            class="panel about-panel"
+            data-i18n-aria-label="screen.about"
+            aria-label="소개"
+          >
+            <div class="panel-heading about-panel__heading">
+              <p class="about-panel__eyebrow" data-i18n="screen.about">소개</p>
+              <a
+                class="about-cta"
+                id="about-cta"
+                href="#list"
+                data-i18n="about.cta"
+                >바로 돌려보기 →</a
+              >
+            </div>
+            <div class="about-doc" id="about-doc" tabindex="-1">
+              <!-- ABOUT-DOC -->
+            </div>
+          </section>
+
+          <div id="catalog-screen" hidden>
             <!--
               패널 id 는 네비 해시(#list·#coverage)와 일부러 다르게 둔다.
               같으면 브라우저의 fragment 스크롤·초점 리셋이 뒤로가기 때마다 앱의

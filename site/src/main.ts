@@ -35,6 +35,8 @@ import {
   familyDisplayName,
 } from "./korean-display-names.js";
 import {
+  aboutHash,
+  isAboutHash,
   catalogTabActivation,
   screenForHash,
   scrollBehaviorForPreference,
@@ -73,8 +75,11 @@ import {
   vendoredVectorRoot,
 } from "./remote-assets.js";
 
-/** 해시가 알고리즘 deep-link면 상세 화면, 그 외 anchor는 목록 화면이다. */
-type ScreenName = "list" | "detail";
+/**
+ * 화면 셋. 빈 해시·`#about`은 소개, 알고리즘 deep-link는 상세, 그 밖의 anchor는
+ * 목록이다. 판정 자체는 navigation.ts가 든다.
+ */
+type ScreenName = "about" | "list" | "detail";
 
 type SpecTabId = "overview" | "spec" | "implementation";
 
@@ -387,6 +392,17 @@ function main(): void {
   const detailPanel = required<HTMLElement>("#detail");
   const matrix = required<HTMLElement>("#coverage-matrix");
   const catalogScreen = required<HTMLElement>("#catalog-screen");
+  /*
+    소개 화면. 본문(#about-doc 안)은 빌드가 README.md 를 옮겨 넣은 정적 HTML이라
+    화면 코드가 만들지도 다시 그리지도 않는다. 여기서 잡는 것은 셸이 들고 있는
+    바깥 껍데기뿐이다 — 본문 제목이 바뀌어도 이 선택자는 흔들리지 않는다.
+  */
+  const aboutPanel = required<HTMLElement>("#about-panel");
+  const aboutDoc = required<HTMLElement>("#about-doc");
+  const aboutNavLink = required<HTMLAnchorElement>("#nav-about");
+  const aboutCta = required<HTMLAnchorElement>("#about-cta");
+  const skipLink = required<HTMLAnchorElement>(".skip-link");
+  const mainContent = required<HTMLElement>("#main-content");
   const topbar = required<HTMLElement>(".topbar");
   const brandHome = required<HTMLAnchorElement>("#brand-home");
   const sidebar = required<HTMLElement>("#sidebar");
@@ -442,7 +458,9 @@ function main(): void {
   let searchAidStatus: SearchAidStatus = "idle";
   let selectedId = "";
   let initialSelectedId = "";
-  let screen: ScreenName = "list";
+  // 첫 화면은 소개다. 정적 HTML도 소개를 펴 둔 상태로 게시되므로, 스크립트가
+  // 늦게 붙어도 처음 보이는 화면과 이 값이 어긋나지 않는다.
+  let screen: ScreenName = "about";
   let listScrollY = 0;
   let listScrollTab: CatalogTabId = "list";
   let activeSpecTab: SpecTabId = "overview";
@@ -677,6 +695,7 @@ function main(): void {
   }
 
   function activeScreenTitle(): string {
+    if (screen === "about") return t("screen.about");
     const definition = catalogTabDefinitions.find(
       (item) => item.id === activeCatalogTab,
     );
@@ -699,17 +718,29 @@ function main(): void {
     if (options.focusToggle) sidebarToggle.focus({ preventScroll: true });
   }
 
-  /** 사이드바 네비는 링크이므로 선택 표시는 aria-current로 알린다. */
+  /**
+   * 사이드바 네비는 링크이므로 선택 표시는 aria-current로 알린다.
+   *
+   * 패널의 열고 닫힘은 지금 고른 카탈로그 탭만 본다. 카탈로그 화면 자체를
+   * 걷어내는 일은 상위(applyScreen)가 #catalog-screen 하나로 하므로, 소개·상세를
+   * 보는 동안에도 안쪽 패널 상태는 그대로 남아 목록으로 돌아왔을 때 보던 탭이 선다.
+   *
+   * 활성 표시는 화면까지 본다. 상세는 목록의 하위 컨텍스트라 목록에 표시를 남기지만,
+   * 소개는 카탈로그 밖 화면이라 카탈로그 항목이 눌린 것처럼 보이면 안 된다.
+   */
   function applyCatalogTabs(): void {
+    const onAbout = screen === "about";
     for (const definition of catalogTabDefinitions) {
       const control = catalogTabControls.get(definition.id);
       if (!control) continue;
       const active = definition.id === activeCatalogTab;
-      if (active) control.tab.setAttribute("aria-current", "page");
+      if (active && !onAbout) control.tab.setAttribute("aria-current", "page");
       else control.tab.removeAttribute("aria-current");
       control.panel.hidden = !active;
     }
-    if (screen === "list") screenTitle.textContent = activeScreenTitle();
+    if (onAbout) aboutNavLink.setAttribute("aria-current", "page");
+    else aboutNavLink.removeAttribute("aria-current");
+    if (screen !== "detail") screenTitle.textContent = activeScreenTitle();
   }
 
   function focusCatalogTab(): void {
@@ -753,6 +784,19 @@ function main(): void {
     activeCatalogTab = tab;
     applyCatalogTabs();
     ensureContentVisible();
+  }
+
+  /**
+   * 소개 복귀 초점은 본문 상자로 보낸다. 안쪽 제목은 빌드가 만든 생성물이라
+   * 화면 코드가 그 구조에 기대지 않는다.
+   *
+   * 소개는 읽는 화면이라 스크롤은 늘 처음부터다. 본문 앵커로 들어온 이동은 이
+   * 경로를 타지 않는다 — 화면이 바뀌지 않아 라우팅이 일찍 끝나고, 스크롤은
+   * 브라우저의 기본 동작이 그대로 맡는다.
+   */
+  function focusAbout(scroll: boolean): void {
+    if (scroll) window.scrollTo({ top: 0, behavior: "auto" });
+    aboutDoc.focus({ preventScroll: true });
   }
 
   /** 목록 복귀 초점은 직전에 보던 카드, 없으면 목록 제목으로 보낸다. */
@@ -962,6 +1006,22 @@ function main(): void {
     }
     render();
     focusListEntry(true);
+  }
+
+  /**
+   * 소개로 이동한다. 본문 자체는 셸에 이미 들어 있어 다시 그릴 것이 없고,
+   * 화면 전환과 초점만 옮기면 된다.
+   *
+   * 목록 복귀(returnToList)와 같은 모양으로 둔다 — 해시를 먼저 바꾸고 라우팅을
+   * 직접 한 번 태운다. pushState는 hashchange를 발생시키지 않으므로, 여기서
+   * 태우지 않으면 주소만 바뀌고 보던 화면이 그대로 남는다.
+   */
+  function goToAbout(): void {
+    if (window.location.hash !== aboutHash) {
+      window.history.pushState(null, "", aboutHash);
+    }
+    render();
+    focusAbout(true);
   }
 
   function algorithmLink(
@@ -2419,7 +2479,8 @@ function main(): void {
   }
 
   /**
-   * 화면은 알고리즘 deep-link 여부 하나로 결정된다. 26차에 상세가 탭형으로
+   * 화면은 해시 하나로 결정된다 — 빈 해시·#about 계열이면 소개, 알고리즘
+   * deep-link면 상세, 나머지는 목록이다. 26차에 상세가 탭형으로
    * 통일되면서 상세 안 섹션 anchor(#detail·#compare)가 사라졌고, 예외 처리도
    * 함께 걷었다. 그 해시로 들어오는 옛 링크는 알고리즘을 지목하지 않으므로 열
    * 상세가 없고, 여기서 목록으로 떨어진다 — 새 창에서 그 해시를 열었을 때
@@ -2435,22 +2496,26 @@ function main(): void {
   function applyScreen(selected: CatalogIndexEntry | undefined): void {
     const nextScreen = nextScreenForHash();
     const onDetail = nextScreen === "detail";
-    // 상세 화면에서는 해시에 탭 정보가 없으므로 마지막 목록 탭을 유지한다.
-    if (!onDetail) {
+    // 해시가 탭을 지목하는 것은 목록 화면일 때뿐이다. 상세·소개 해시에는 탭
+    // 정보가 없으므로 마지막 목록 탭을 그대로 유지한다.
+    if (nextScreen === "list") {
       activeCatalogTab =
         catalogTabFromHash(window.location.hash) ?? activeCatalogTab;
     }
     if (screen !== nextScreen) {
-      if (nextScreen === "detail") {
+      // 목록을 떠나는 모든 경로에서 보던 자리를 적어 둔다. 상세뿐 아니라 소개로
+      // 나갔다 돌아오는 길에서도 같은 자리로 복귀해야 한다.
+      if (screen === "list") {
         listScrollY = window.scrollY;
         listScrollTab = activeCatalogTab;
-        // 상세는 언제 들어와도 개요부터 읽는다. 같은 알고리즘을 다시 열어
-        // selectAlgorithm의 선택 변경 초기화가 걸리지 않는 경로도 여기서 받는다.
-        activeSpecTab = "overview";
       }
+      // 상세는 언제 들어와도 개요부터 읽는다. 같은 알고리즘을 다시 열어
+      // selectAlgorithm의 선택 변경 초기화가 걸리지 않는 경로도 여기서 받는다.
+      if (onDetail) activeSpecTab = "overview";
       screen = nextScreen;
     }
-    catalogScreen.hidden = onDetail;
+    aboutPanel.hidden = nextScreen !== "about";
+    catalogScreen.hidden = nextScreen !== "list";
     detailPanel.hidden = !onDetail;
     // 문서 제목도 화면에 보이는 이름이라 함께 표기를 따른다. 공유 링크의 hash는
     // 표기와 무관한 id 그대로다.
@@ -2505,9 +2570,9 @@ function main(): void {
     );
     const nextScreen = nextScreenForHash();
     const nextCatalogTab =
-      nextScreen === "detail"
-        ? activeCatalogTab
-        : (catalogTabFromHash(window.location.hash) ?? activeCatalogTab);
+      nextScreen === "list"
+        ? (catalogTabFromHash(window.location.hash) ?? activeCatalogTab)
+        : activeCatalogTab;
     const selectionChanged =
       nextSelectedId !== undefined && nextSelectedId !== selectedId;
     const screenChanged = nextScreen !== screen;
@@ -2520,6 +2585,7 @@ function main(): void {
     if (selectionChanged || screenChanged) {
       render();
       if (screen === "detail") focusSelectedDetail(scroll);
+      else if (screen === "about") focusAbout(scroll);
       else focusListEntry(scroll);
       return;
     }
@@ -2659,18 +2725,58 @@ function main(): void {
     });
   }
   /*
-    브랜드는 사이트 홈 링크다. 목록 복귀는 상세 화면의 "← 목록으로"와 같은
-    경로를 타고, 드로어에서 눌렸을 때 닫는 것은 사이드바 네비와 같은 경로다.
+    브랜드는 사이트 홈 링크다. 홈은 첫 접속에서 서는 화면과 같아야 하므로 소개로
+    간다. 드로어에서 눌렸을 때 닫는 것은 사이드바 네비와 같은 경로다.
   */
-  brandHome.addEventListener("click", (event) => {
+  for (const homeLink of [brandHome, aboutNavLink]) {
+    homeLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      try {
+        goToAbout();
+        closeSidebar();
+      } catch (error: unknown) {
+        reportBrowserFailure(error, "error.openAbout");
+      }
+    });
+  }
+  /*
+    소개 화면의 진입 동선. 이 사이트에서 목록이 값을 하는 자리가 브라우저 실행이라,
+    이야기를 읽는 중에도 데모까지 한 번의 클릭으로 닿게 둔다. 이동 자체는 사이드바
+    목록 항목과 같은 경로를 태워 화면·초점 처리가 갈리지 않게 한다.
+  */
+  aboutCta.addEventListener("click", (event) => {
     event.preventDefault();
     try {
-      returnToList();
-      closeSidebar();
+      selectCatalogTab("list");
     } catch (error: unknown) {
-      reportBrowserFailure(error, "error.returnToList");
+      reportBrowserFailure(error, "error.switchCatalogScreen");
     }
   });
+  /*
+    건너뛰기 링크는 화면 이동이 아니라 초점 이동이다. 기본 동작에 맡기면 해시가
+    #main-content 로 바뀌고, 화면 판정이 그 해시를 소개도 알고리즘 deep-link 도
+    아닌 것으로 보아 목록으로 튕긴다. 해시를 건드리지 않고 초점만 옮긴다.
+  */
+  skipLink.addEventListener("click", (event) => {
+    event.preventDefault();
+    mainContent.focus({ preventScroll: true });
+    mainContent.scrollIntoView({
+      behavior: preferredScrollBehavior(),
+      block: "start",
+    });
+  });
+  /*
+    카탈로그가 오기 전에 서는 화면. 정적 HTML은 소개를 펴 둔 채로 게시되므로,
+    공유 링크(#algorithm/… · #coverage)로 들어온 첫 페인트에서 소개 본문이 잠깐
+    스치지 않도록 여기서 먼저 접는다. 어느 카탈로그 화면인지는 인덱스가 있어야
+    정해지므로 여기서 가르는 것은 소개인가 아닌가 하나뿐이고, 나머지는 첫 render가 맡는다.
+  */
+  if (!isAboutHash(window.location.hash)) {
+    screen = "list";
+    aboutPanel.hidden = true;
+    catalogScreen.hidden = false;
+    applyCatalogTabs();
+  }
   trackTopbarHeight();
   applyTheme(activeTheme);
   applyNameLanguage();
