@@ -154,9 +154,10 @@ test("빠지는 것은 그 구간 하나뿐이다", () => {
   // 사이트 주소 안내 하나만 빠지고 나머지는 그대로 서 있어야 한다.
   const readmeQuotes = [...readme.matchAll(/(?:^>.*\n)+/gmu)].length;
   const pageQuotes = [...page.matchAll(/class="doc-quote"/gu)].length;
-  assert.equal(readmeQuotes, 3, "README 의 인용 블록 수가 달라졌습니다.");
+  assert.equal(readmeQuotes, 4, "README 의 인용 블록 수가 달라졌습니다.");
   assert.equal(pageQuotes, readmeQuotes - 1, "빠진 블록 수가 1개가 아닙니다.");
   for (const kept of [
+    "8종을 잘라 낸 공개 스냅샷",
     "일회성 스냅샷",
     "덧붙이면 이 기능은 원래 계획에",
   ]) {
