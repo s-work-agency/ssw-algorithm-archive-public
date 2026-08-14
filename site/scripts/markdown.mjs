@@ -22,6 +22,10 @@
  * - 구분선(`---`).
  * - 인라인: `` `코드` ``, `**굵게**`, `[라벨](주소)`, 맨 URL 자동 링크.
  *
+ * - HTML 주석. 화면에 나가지 않으므로 그냥 버린다. 다만 skipRegion으로 지정한
+ *   주석 한 쌍 사이는 블록째로 건너뛴다. 원문에는 남기되 이 사본에서만 빼고
+ *   싶은 대목(사이트가 자기 자신을 가리키는 안내 같은)을 위한 자리다.
+ *
  * 일부러 다루지 않는 것
  * - 별표 하나짜리 기울임(`*기울임*`). README에는 기울임이 없고, 대신
  *   `A*`(A 스타)가 본문과 표에 나온다. 하나짜리를 강조로 받으면 그 별표가
@@ -156,6 +160,25 @@ function isTableDelimiter(line) {
   return cells.length > 0 && cells.every((cell) => /^:?-{2,}:?$/u.test(cell));
 }
 
+/**
+ * 주석 블록 하나를 읽어 안쪽 문구를 돌려준다. 여는 줄에서 닫히지 않으면 `-->`가
+ * 나오는 줄까지 이어 읽는다. 닫히지 않은 채 문서가 끝나면 세운다 — 남은 본문이
+ * 통째로 사라지는 것이 가장 나쁜 결과다.
+ */
+function readComment(lines, index) {
+  const collected = [];
+  let cursor = index;
+  while (cursor < lines.length) {
+    collected.push(lines[cursor]);
+    if (lines[cursor].includes("-->")) {
+      const text = collected.join("\n").trim();
+      return { text: text.slice(4, -3).trim(), next: cursor + 1 };
+    }
+    cursor += 1;
+  }
+  throw new Error("닫히지 않은 HTML 주석이 있습니다.");
+}
+
 const headingPattern = /^(#{1,6})\s+(.+?)\s*#*\s*$/u;
 const rulePattern = /^ {0,3}(?:-{3,}|\*{3,}|_{3,})\s*$/u;
 const listItemPattern = /^(\s*)(?:[-*+]|\d+[.)])\s+(.*)$/u;
@@ -168,6 +191,7 @@ function startsNewBlock(lines, index) {
   if (headingPattern.test(line)) return true;
   if (rulePattern.test(line)) return true;
   if (line.startsWith(">")) return true;
+  if (line.trim().startsWith("<!--")) return true;
   if (listItemPattern.test(line)) return true;
   return line.includes("|") && isTableDelimiter(lines[index + 1] ?? "");
 }
@@ -249,6 +273,38 @@ function renderBlocks(lines, context) {
     const line = lines[index];
     if (!line.trim()) {
       index += 1;
+      continue;
+    }
+
+    if (line.trim().startsWith("<!--")) {
+      const comment = readComment(lines, index);
+      index = comment.next;
+      if (comment.text === context.skipRegion.end) {
+        throw new Error(
+          `여는 짝 없이 닫는 마커만 있습니다: ${context.skipRegion.end}`,
+        );
+      }
+      if (comment.text !== context.skipRegion.start) continue;
+      // 마커 사이는 블록째로 버린다. 무엇을 몇 개 버렸는지는 stats가 들고,
+      // 부르는 쪽이 그 수를 고정해 조용한 누락을 막는다.
+      let closed = false;
+      while (index < lines.length) {
+        if (!lines[index].trim().startsWith("<!--")) {
+          index += 1;
+          continue;
+        }
+        const marker = readComment(lines, index);
+        index = marker.next;
+        if (marker.text !== context.skipRegion.end) continue;
+        closed = true;
+        break;
+      }
+      if (!closed) {
+        throw new Error(
+          `닫는 마커를 찾지 못했습니다: ${context.skipRegion.end}`,
+        );
+      }
+      context.stats.skippedRegions += 1;
       continue;
     }
 
@@ -336,8 +392,11 @@ function renderBlocks(lines, context) {
  * - `headingLevelOffset` — 제목 레벨을 내리는 칸수. 화면에 이미 h1이 있으면 1.
  * - `fencedRenderers` — 언어 이름 → 그 울타리 블록을 그리는 함수. 등록된 언어는
  *   코드 블록 대신 이쪽이 그린다.
+ * - `skipRegion` — 이 사본에서만 뺄 구간을 감싸는 주석 문구 한 쌍(`{start, end}`).
+ *   기본값은 아무것도 건너뛰지 않는 값이라, 지정하지 않으면 원문 그대로 나간다.
  *
- * 돌려주는 stats는 부르는 쪽이 검증에 쓴다(앵커가 실제 제목을 가리키는지 등).
+ * 돌려주는 stats는 부르는 쪽이 검증에 쓴다(앵커가 실제 제목을 가리키는지,
+ * 건너뛴 구간이 예상한 수만큼인지 등).
  */
 export function renderMarkdown(markdown, options = {}) {
   const context = {
@@ -345,8 +404,9 @@ export function renderMarkdown(markdown, options = {}) {
     headingIdPrefix: options.headingIdPrefix ?? "",
     headingLevelOffset: options.headingLevelOffset ?? 0,
     fencedRenderers: options.fencedRenderers ?? {},
+    skipRegion: options.skipRegion ?? { start: null, end: null },
     usedSlugs: new Set(),
-    stats: { headings: [], links: [], codeBlocks: [] },
+    stats: { headings: [], links: [], codeBlocks: [], skippedRegions: 0 },
   };
   const lines = markdown
     .replace(/^﻿/u, "")

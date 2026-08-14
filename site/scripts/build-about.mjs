@@ -46,6 +46,29 @@ const documentBlobBase =
  */
 const anchorPrefix = "about/";
 
+/**
+ * 이 사본에서만 빼는 구간을 감싸는 주석. README 원문에는 그대로 남는다.
+ *
+ * 지금 이 마커가 감싸는 것은 공개 사이트 주소 안내 하나다. 저장소를 먼저 본
+ * 사람에게는 사이트로 들어오는 문이지만, 이미 사이트를 보고 있는 사람에게는
+ * 자기 자신을 가리키는 링크라 읽을 이유가 없다.
+ *
+ * HTML 주석이라 GitHub 렌더에는 나타나지 않는다. 마커 방식을 고른 이유는
+ * "자기 URL을 든 인용을 거른다" 같은 규칙이 나중에 다른 블록까지 조용히 집어갈
+ * 수 있기 때문이다. 무엇을 빼는지 원문에 눈으로 보이게 적어 두는 편이 안전하다.
+ */
+const skipRegion = {
+  start: "site-only-skip-start",
+  end: "site-only-skip-end",
+};
+
+/**
+ * 건너뛸 구간의 수를 못 박는다. 마커가 지워지면(구간이 0개) 자기 참조 안내가
+ * 조용히 사이트에 실리고, 늘어나면 의도하지 않은 대목이 사라진다. 둘 다 화면을
+ * 봐야만 눈에 띄는 종류라 빌드에서 세운다.
+ */
+const expectedSkippedRegions = 1;
+
 const readmePath = fileURLToPath(new URL("README.md", deployRoot));
 const indexPath = fileURLToPath(new URL("index.html", deployRoot));
 
@@ -105,8 +128,14 @@ async function main() {
     // 화면 제목(h1)은 탑바가 이미 들고 있다. 본문은 h2부터 시작해야 개요가 맞는다.
     headingLevelOffset: 1,
     fencedRenderers: { mermaid: createFlowchartRenderer(diagrams) },
+    skipRegion,
   });
   assertAnchorsResolve(stats);
+  if (stats.skippedRegions !== expectedSkippedRegions) {
+    throw new Error(
+      `사이트에서 뺄 구간이 ${expectedSkippedRegions}개여야 하는데 ${stats.skippedRegions}개입니다. README의 ${skipRegion.start} 마커를 확인하세요.`,
+    );
+  }
 
   const shell = await readFile(indexPath, "utf8");
   const occurrences = shell.split(placeholder).length - 1;
@@ -123,6 +152,9 @@ async function main() {
   console.log(`소개 본문 생성 완료: ${indexPath}`);
   console.log(
     `  제목 ${stats.headings.length}개 · 링크 ${stats.links.length}개(문서 ${counts.documents} · 본문 앵커 ${counts.anchors} · 바깥 주소 ${external})`,
+  );
+  console.log(
+    `  사이트에서 뺀 구간 ${stats.skippedRegions}개 (${skipRegion.start} 마커)`,
   );
   console.log(
     `  코드 블록 ${stats.codeBlocks.length}개${

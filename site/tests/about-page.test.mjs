@@ -100,10 +100,31 @@ test("본문 절 앵커는 #about/ 아래에 있고 갈 제목이 실제로 있�
   }
 });
 
-test("사이트 자기 주소는 그대로 두고 링크로 세운다", () => {
+test("자기 자신을 가리키는 안내는 README 에만 남고 사이트에서는 빠진다", () => {
   const selfUrl = "https://s-work-agency.github.io/ssw-algorithm-archive-public/";
-  assert.ok(readme.includes(selfUrl), "README 에 사이트 주소가 없습니다.");
-  assert.ok(page.includes(`href="${selfUrl}"`), "사이트 주소가 링크로 서지 않았습니다.");
+  // 저장소를 먼저 본 사람에게는 사이트로 들어오는 문이라 원문에는 남긴다.
+  assert.ok(readme.includes(selfUrl), "README 에서 사이트 주소가 사라졌습니다.");
+  assert.ok(
+    readme.includes("<!-- site-only-skip-start -->"),
+    "README 에 빼기 마커가 없습니다.",
+  );
+  // 사이트를 보고 있는 사람에게는 자기 자신을 가리키는 링크라 읽을 이유가 없다.
+  assert.ok(!page.includes(selfUrl), "사이트에 자기 참조 주소가 남아 있습니다.");
+  // 마커 자체도 화면에 새어 나가면 안 된다.
+  assert.ok(!page.includes("site-only-skip"), "빼기 마커가 화면에 새어 나갔습니다.");
+});
+
+test("빠지는 것은 그 구간 하나뿐이다", () => {
+  // 규칙이 조용히 다른 블록까지 집어가면 여기서 잡힌다. README 의 인용 둘 중
+  // 하나만 빠지고, 나머지 하나(비공개 저장소 안내)는 그대로 서 있어야 한다.
+  const readmeQuotes = [...readme.matchAll(/(?:^>.*\n)+/gmu)].length;
+  const pageQuotes = [...page.matchAll(/class="doc-quote"/gu)].length;
+  assert.equal(readmeQuotes, 2, "README 의 인용 블록 수가 달라졌습니다.");
+  assert.equal(pageQuotes, readmeQuotes - 1, "빠진 블록 수가 1개가 아닙니다.");
+  assert.ok(
+    page.includes("본체 구현과 콘텐츠"),
+    "남아야 할 인용까지 빠졌습니다.",
+  );
 });
 
 /** README 의 mermaid 블록. 노드 정의 줄과 화살표 수가 곧 기대값이다. */

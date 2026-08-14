@@ -156,6 +156,59 @@ test("언어 전용 렌더러가 세우면 그대로 올려 보낸다", () => {
   );
 });
 
+test("HTML 주석은 화면에 나가지 않는다", () => {
+  assert.equal(render("<!-- 메모 -->\n\n본문입니다.\n"), "<p>본문입니다.</p>");
+  // 여러 줄에 걸친 주석도 한 덩어리로 버린다.
+  assert.equal(render("<!-- 첫 줄\n둘째 줄 -->\n\n본문.\n"), "<p>본문.</p>");
+});
+
+test("skipRegion 마커 사이는 블록째로 빠지고 그 수가 세어진다", () => {
+  const source = [
+    "앞 문단.",
+    "",
+    "<!-- skip-start -->",
+    "",
+    "> 빠질 인용",
+    "",
+    "빠질 문단.",
+    "",
+    "<!-- skip-end -->",
+    "",
+    "뒤 문단.",
+  ].join("\n");
+  const { html, stats } = renderMarkdown(source, {
+    skipRegion: { start: "skip-start", end: "skip-end" },
+  });
+  assert.equal(html, "<p>앞 문단.</p>\n<p>뒤 문단.</p>");
+  // 몇 개를 뺐는지 세어 두어야 부르는 쪽이 그 수를 고정할 수 있다.
+  assert.equal(stats.skippedRegions, 1);
+});
+
+test("마커를 주지 않으면 아무것도 빠지지 않는다", () => {
+  const { html, stats } = renderMarkdown("<!-- skip-start -->\n\n본문.\n");
+  assert.equal(html, "<p>본문.</p>");
+  assert.equal(stats.skippedRegions, 0);
+});
+
+test("마커가 짝을 잃으면 조용히 넘어가지 않는다", () => {
+  const skipRegion = { start: "skip-start", end: "skip-end" };
+  // 닫는 마커가 없으면 뒤 본문이 통째로 사라진다. 그 전에 세운다.
+  assert.throws(
+    () =>
+      renderMarkdown("<!-- skip-start -->\n\n본문.\n", { skipRegion }),
+    /닫는 마커를 찾지 못했습니다/u,
+  );
+  // 여는 마커 없이 닫는 마커만 있는 것도 원문이 어긋난 상태다.
+  assert.throws(
+    () => renderMarkdown("본문.\n\n<!-- skip-end -->\n", { skipRegion }),
+    /여는 짝 없이 닫는 마커만/u,
+  );
+  assert.throws(
+    () => renderMarkdown("<!-- 닫히지 않은 주석\n본문.\n"),
+    /닫히지 않은 HTML 주석/u,
+  );
+});
+
 test("원문 HTML 은 문자로 내보낸다", () => {
   assert.equal(
     render("<script>alert(1)</script>\n"),
