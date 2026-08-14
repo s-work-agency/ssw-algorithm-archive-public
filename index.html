@@ -395,8 +395,9 @@
 </g>
 <g>
 <rect class="doc-figure__box" x="223" y="58.5" width="155" height="75" rx="10" />
-<text class="doc-figure__text doc-figure__text--title" x="300.5" y="91" text-anchor="middle" style="font-size: 13px">Web Worker</text>
-<text class="doc-figure__text" x="300.5" y="108" text-anchor="middle" style="font-size: 12px">격리 실행 · 2초 제한</text>
+<text class="doc-figure__text doc-figure__text--title" x="300.5" y="82.5" text-anchor="middle" style="font-size: 13px">Web Worker</text>
+<text class="doc-figure__text" x="300.5" y="99.5" text-anchor="middle" style="font-size: 12px">별도 스레드</text>
+<text class="doc-figure__text" x="300.5" y="116.5" text-anchor="middle" style="font-size: 12px">격리 · 2초 제한</text>
 </g>
 <g>
 <path class="doc-figure__box doc-figure__box--decision" d="M436 96 L452 58.5 L575 58.5 L591 96 L575 133.5 L452 133.5 Z" />
@@ -415,11 +416,12 @@
 </figure>
 <ul class="doc-list">
 <li>돌아가는 바이트는 <strong>화면이 무결성 검사를 통과해 받아 둔 소스 그 자체</strong>입니다. 실행하려고 따로 받아오지 않습니다. 눈에 보이는 코드와 실제로 도는 코드가 같다는 것이 이 기능의 전제라, 둘을 다른 경로로 두지 않았습니다.</li>
-<li>실행은 <strong>Web Worker 안에서만</strong> 일어납니다. 화면 DOM에 손댈 수 없고, 무한 루프가 나도 UI 스레드가 멈추지 않습니다. <strong>2초를 넘기면 워커를 종료</strong>합니다. 협조를 구하는 신호가 아니라 강제 종료라 <code>while (true)</code>도 실제로 끊깁니다.</li>
+<li>실행은 <strong>브라우저에 내장된 별도 스레드(Web Worker 표준 API) 안에서만</strong> 일어납니다. 워커 스크립트는 파일로 두지 않고 받아 둔 소스 바이트로 그 자리에서 만들어 띄우므로, 실행하려고 밖으로 나가는 요청이 없습니다. 화면을 그리는 스레드와 분리돼 있어 DOM에 손댈 수 없고, 무한 루프가 돌아도 화면이 멈추지 않습니다. <strong>2초를 넘기면 밖에서 워커를 종료</strong>합니다. 협조를 구하는 신호가 아니라 강제 종료라 <code>while (true)</code>도 실제로 끊깁니다.</li>
 <li>입력 JSON은 <strong>고쳐서 다시 돌릴 수 있습니다.</strong> 케이스를 그대로 돌리면 기대값 대조가 되고, 값을 바꿔 돌리면 계약이 무엇을 거절하는지 직접 밟아 볼 수 있습니다. 고쳐 돌린 결과에는 &quot;기대값은 원래 케이스의 것&quot;이라는 표시가 함께 붙습니다.</li>
 <li>판정은 느슨하지 않습니다. 출력 케이스는 값이 정확히 같아야 하고, 오류를 기대하는 케이스는 <strong>계약이 선언한 오류 코드까지 같아야</strong> 통과입니다. 아무 예외나 났다고 통과시키면 오류 계약을 검사하지 않는 것과 같습니다.</li>
 </ul>
-<p>이 기능은 <a href="#about/1-가볍게-시작했습니다">1절</a>의 출발점과 곧장 이어집니다. &quot;검증된 구현을 참조해 꺼내 쓴다&quot;가 성립하려면 <strong>꺼낸 코드가 계약대로 도는지 보는 비용이 0에 가까워야</strong> 합니다. 소스를 내려받아 프로젝트에 붙여 보고 나서야 확인이 되는 구조라면, 사람도 모델도 결국 다시 검증 비용을 치릅니다. 여기서는 읽던 화면에서 확인이 끝납니다. 자립 파일이라는 제약이 실제로 값을 하는 자리이기도 합니다. 받은 바이트를 그대로 워커에 넣는 것만으로 확인이 끝납니다.</p>
+<p>이 기능은 <a href="#about/1-가볍게-시작했습니다">1절</a>의 출발점과 곧장 이어집니다. &quot;검증된 구현을 참조해 꺼내 쓴다&quot;가 성립하려면 <strong>꺼낸 코드가 계약대로 도는지 보는 비용이 0에 가까워야</strong> 합니다. 소스를 내려받아 프로젝트에 붙여 보고 나서야 확인이 되는 구조라면, 사람도 모델도 결국 다시 검증 비용을 치릅니다. 여기서는 읽던 화면에서 확인이 끝납니다. 자립 파일이라는 제약이 실제로 값을 하는 자리이기도 합니다. 받은 바이트를 그대로 워커 스크립트로 삼는 것만으로 확인이 끝납니다.</p>
+<p>덧붙이면 이 기능은 원래 계획에 없었습니다. 작업 중에 제안으로 올라왔고, 사람이 한 일은 그 제안을 받기로 정한 것뿐입니다. 1절에서 말한 가이드도 대개 이런 모양이라, 무엇을 만들지 먼저 지시하기보다 올라온 것 중에서 무엇을 남길지 고르는 쪽이었습니다.</p>
 <p>&quot;검증됐다&quot;는 문장을 믿어 달라고 하는 대신, 그 문장이 무엇을 확인한 결과인지 직접 밟아 볼 수 있게 한 셈입니다. 브라우저가 그대로 돌릴 수 있는 언어가 JavaScript뿐이라 실행기는 그 카드에만 붙고, 나머지 두 언어는 파이프라인이 남긴 검증 결과 요약으로 확인합니다.</p>
 <hr class="doc-rule" />
 <h3 id="about/8-더-읽기">8. 더 읽기</h3>
