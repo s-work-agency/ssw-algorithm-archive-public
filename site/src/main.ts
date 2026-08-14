@@ -37,10 +37,13 @@ import {
 import {
   aboutHash,
   isAboutHash,
+  isDocumentScreen,
+  isThoughtsHash,
   catalogTabActivation,
   screenForHash,
   scrollBehaviorForPreference,
   selectedIdForNavigation,
+  thoughtsHash,
 } from "./navigation.js";
 import {
   parseUsageScenario,
@@ -76,10 +79,10 @@ import {
 } from "./remote-assets.js";
 
 /**
- * 화면 셋. 빈 해시·`#about`은 소개, 알고리즘 deep-link는 상세, 그 밖의 anchor는
- * 목록이다. 판정 자체는 navigation.ts가 든다.
+ * 화면 넷. 빈 해시·`#about`은 소개, `#thoughts`는 생각, 알고리즘 deep-link는
+ * 상세, 그 밖의 anchor는 목록이다. 판정 자체는 navigation.ts가 든다.
  */
-type ScreenName = "about" | "list" | "detail";
+type ScreenName = "about" | "thoughts" | "list" | "detail";
 
 type SpecTabId = "overview" | "spec" | "implementation";
 
@@ -393,14 +396,18 @@ function main(): void {
   const matrix = required<HTMLElement>("#coverage-matrix");
   const catalogScreen = required<HTMLElement>("#catalog-screen");
   /*
-    소개 화면. 본문(#about-doc 안)은 빌드가 README.md 를 옮겨 넣은 정적 HTML이라
-    화면 코드가 만들지도 다시 그리지도 않는다. 여기서 잡는 것은 셸이 들고 있는
-    바깥 껍데기뿐이다 — 본문 제목이 바뀌어도 이 선택자는 흔들리지 않는다.
+    읽을거리 화면 둘. 본문(#about-doc·#thoughts-doc 안)은 빌드가 저장소의
+    마크다운을 옮겨 넣은 정적 HTML이라 화면 코드가 만들지도 다시 그리지도 않는다.
+    여기서 잡는 것은 셸이 들고 있는 바깥 껍데기뿐이다 — 본문 제목이 바뀌어도 이
+    선택자는 흔들리지 않는다.
   */
   const aboutPanel = required<HTMLElement>("#about-panel");
   const aboutDoc = required<HTMLElement>("#about-doc");
   const aboutNavLink = required<HTMLAnchorElement>("#nav-about");
   const aboutCta = required<HTMLAnchorElement>("#about-cta");
+  const thoughtsPanel = required<HTMLElement>("#thoughts-panel");
+  const thoughtsDoc = required<HTMLElement>("#thoughts-doc");
+  const thoughtsNavLink = required<HTMLAnchorElement>("#nav-thoughts");
   const skipLink = required<HTMLAnchorElement>(".skip-link");
   const mainContent = required<HTMLElement>("#main-content");
   const topbar = required<HTMLElement>(".topbar");
@@ -677,6 +684,13 @@ function main(): void {
     }
     // 상태줄은 위에서 정적 초기 문구로 되돌아갔으므로 마지막 상태를 다시 찍는다.
     refreshStatus();
+    /*
+      탑바 제목도 같은 사정이다. 셸의 data-i18n 은 첫 화면(소개)의 이름이라, 위
+      루프가 보고 있던 화면과 무관하게 그 문구로 되돌린다. 소개가 아닌 화면으로
+      들어온 첫 로드에서 제목이 잠깐 "소개" 로 서던 자리다. 상세만은 알고리즘
+      이름을 들고 있으므로 건드리지 않는다.
+    */
+    if (screen !== "detail") screenTitle.textContent = activeScreenTitle();
   }
 
   /**
@@ -696,6 +710,8 @@ function main(): void {
 
   function activeScreenTitle(): string {
     if (screen === "about") return t("screen.about");
+    // 생각만 탑바가 글의 제목을 든다. 본문에서는 그 제목을 뺐다(build-pages.mjs).
+    if (screen === "thoughts") return t("screen.thoughts");
     const definition = catalogTabDefinitions.find(
       (item) => item.id === activeCatalogTab,
     );
@@ -726,20 +742,27 @@ function main(): void {
    * 보는 동안에도 안쪽 패널 상태는 그대로 남아 목록으로 돌아왔을 때 보던 탭이 선다.
    *
    * 활성 표시는 화면까지 본다. 상세는 목록의 하위 컨텍스트라 목록에 표시를 남기지만,
-   * 소개는 카탈로그 밖 화면이라 카탈로그 항목이 눌린 것처럼 보이면 안 된다.
+   * 읽을거리(소개·생각)는 카탈로그 밖 화면이라 카탈로그 항목이 눌린 것처럼 보이면
+   * 안 된다.
    */
   function applyCatalogTabs(): void {
-    const onAbout = screen === "about";
+    const onDocument = isDocumentScreen(screen);
     for (const definition of catalogTabDefinitions) {
       const control = catalogTabControls.get(definition.id);
       if (!control) continue;
       const active = definition.id === activeCatalogTab;
-      if (active && !onAbout) control.tab.setAttribute("aria-current", "page");
-      else control.tab.removeAttribute("aria-current");
+      if (active && !onDocument) {
+        control.tab.setAttribute("aria-current", "page");
+      } else control.tab.removeAttribute("aria-current");
       control.panel.hidden = !active;
     }
-    if (onAbout) aboutNavLink.setAttribute("aria-current", "page");
-    else aboutNavLink.removeAttribute("aria-current");
+    for (const [link, target] of [
+      [aboutNavLink, "about"],
+      [thoughtsNavLink, "thoughts"],
+    ] as const) {
+      if (screen === target) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    }
     if (screen !== "detail") screenTitle.textContent = activeScreenTitle();
   }
 
@@ -787,16 +810,18 @@ function main(): void {
   }
 
   /**
-   * 소개 복귀 초점은 본문 상자로 보낸다. 안쪽 제목은 빌드가 만든 생성물이라
+   * 읽을거리 복귀 초점은 본문 상자로 보낸다. 안쪽 제목은 빌드가 만든 생성물이라
    * 화면 코드가 그 구조에 기대지 않는다.
    *
-   * 소개는 읽는 화면이라 스크롤은 늘 처음부터다. 본문 앵커로 들어온 이동은 이
-   * 경로를 타지 않는다 — 화면이 바뀌지 않아 라우팅이 일찍 끝나고, 스크롤은
-   * 브라우저의 기본 동작이 그대로 맡는다.
+   * 읽는 화면이라 스크롤은 늘 처음부터다. 본문 앵커로 들어온 이동은 이 경로를
+   * 타지 않는다 — 화면이 바뀌지 않아 라우팅이 일찍 끝나고, 스크롤은 브라우저의
+   * 기본 동작이 그대로 맡는다.
    */
-  function focusAbout(scroll: boolean): void {
+  function focusDocument(scroll: boolean): void {
     if (scroll) window.scrollTo({ top: 0, behavior: "auto" });
-    aboutDoc.focus({ preventScroll: true });
+    (screen === "thoughts" ? thoughtsDoc : aboutDoc).focus({
+      preventScroll: true,
+    });
   }
 
   /** 목록 복귀 초점은 직전에 보던 카드, 없으면 목록 제목으로 보낸다. */
@@ -1009,19 +1034,19 @@ function main(): void {
   }
 
   /**
-   * 소개로 이동한다. 본문 자체는 셸에 이미 들어 있어 다시 그릴 것이 없고,
-   * 화면 전환과 초점만 옮기면 된다.
+   * 읽을거리(소개·생각)로 이동한다. 본문 자체는 셸에 이미 들어 있어 다시 그릴
+   * 것이 없고, 화면 전환과 초점만 옮기면 된다.
    *
    * 목록 복귀(returnToList)와 같은 모양으로 둔다 — 해시를 먼저 바꾸고 라우팅을
    * 직접 한 번 태운다. pushState는 hashchange를 발생시키지 않으므로, 여기서
    * 태우지 않으면 주소만 바뀌고 보던 화면이 그대로 남는다.
    */
-  function goToAbout(): void {
-    if (window.location.hash !== aboutHash) {
-      window.history.pushState(null, "", aboutHash);
+  function goToDocument(hash: string): void {
+    if (window.location.hash !== hash) {
+      window.history.pushState(null, "", hash);
     }
     render();
-    focusAbout(true);
+    focusDocument(true);
   }
 
   function algorithmLink(
@@ -2515,6 +2540,7 @@ function main(): void {
       screen = nextScreen;
     }
     aboutPanel.hidden = nextScreen !== "about";
+    thoughtsPanel.hidden = nextScreen !== "thoughts";
     catalogScreen.hidden = nextScreen !== "list";
     detailPanel.hidden = !onDetail;
     // 문서 제목도 화면에 보이는 이름이라 함께 표기를 따른다. 공유 링크의 hash는
@@ -2585,7 +2611,7 @@ function main(): void {
     if (selectionChanged || screenChanged) {
       render();
       if (screen === "detail") focusSelectedDetail(scroll);
-      else if (screen === "about") focusAbout(scroll);
+      else if (isDocumentScreen(screen)) focusDocument(scroll);
       else focusListEntry(scroll);
       return;
     }
@@ -2732,13 +2758,23 @@ function main(): void {
     homeLink.addEventListener("click", (event) => {
       event.preventDefault();
       try {
-        goToAbout();
+        goToDocument(aboutHash);
         closeSidebar();
       } catch (error: unknown) {
         reportBrowserFailure(error, "error.openAbout");
       }
     });
   }
+  // 생각은 소개와 같은 읽을거리라 이동 경로도 같다. 해시만 다르다.
+  thoughtsNavLink.addEventListener("click", (event) => {
+    event.preventDefault();
+    try {
+      goToDocument(thoughtsHash);
+      closeSidebar();
+    } catch (error: unknown) {
+      reportBrowserFailure(error, "error.openThoughts");
+    }
+  });
   /*
     소개 화면의 진입 동선. 이 사이트에서 목록이 값을 하는 자리가 브라우저 실행이라,
     이야기를 읽는 중에도 데모까지 한 번의 클릭으로 닿게 둔다. 이동 자체는 사이드바
@@ -2767,11 +2803,17 @@ function main(): void {
   });
   /*
     카탈로그가 오기 전에 서는 화면. 정적 HTML은 소개를 펴 둔 채로 게시되므로,
-    공유 링크(#algorithm/… · #coverage)로 들어온 첫 페인트에서 소개 본문이 잠깐
-    스치지 않도록 여기서 먼저 접는다. 어느 카탈로그 화면인지는 인덱스가 있어야
-    정해지므로 여기서 가르는 것은 소개인가 아닌가 하나뿐이고, 나머지는 첫 render가 맡는다.
+    다른 화면의 링크(#thoughts · #algorithm/… · #coverage)로 들어온 첫 페인트에서
+    소개 본문이 잠깐 스치지 않도록 여기서 먼저 접는다. 생각은 본문이 셸에 이미
+    들어 있어 인덱스 없이도 바로 세울 수 있고, 어느 카탈로그 화면인지는 인덱스가
+    있어야 정해지므로 나머지는 첫 render가 맡는다.
   */
-  if (!isAboutHash(window.location.hash)) {
+  if (isThoughtsHash(window.location.hash)) {
+    screen = "thoughts";
+    aboutPanel.hidden = true;
+    thoughtsPanel.hidden = false;
+    applyCatalogTabs();
+  } else if (!isAboutHash(window.location.hash)) {
     screen = "list";
     aboutPanel.hidden = true;
     catalogScreen.hidden = false;

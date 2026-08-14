@@ -10,7 +10,7 @@
   },
   "scripts": {
     "clean": "node scripts/clean.mjs",
-    "build": "pnpm run clean && pnpm run lint && tsc --project tsconfig.json && node scripts/copy-static.mjs && node scripts/build-about.mjs",
+    "build": "pnpm run clean && pnpm run lint && tsc --project tsconfig.json && node scripts/copy-static.mjs && node scripts/build-pages.mjs",
     "test": "pnpm run build && node --test tests/*.test.mjs",
     "lint": "tsc --project tsconfig.json --noEmit",
     "snapshot": "node scripts/build-snapshot.mjs"

@@ -78,7 +78,7 @@
           aria-label="사이트 영역"
         >
           <!--
-            소개는 카탈로그 영역이 아니라 사이트 첫 화면이라 그룹 라벨 밖 맨 위에
+            읽을거리 둘은 카탈로그 영역이 아니라 글이라, 그룹 라벨 밖 맨 위에
             둔다. 기본 화면이 소개라 JS 로드 전에도 활성 표시가 맞다.
           -->
           <ul class="nav-list">
@@ -90,6 +90,15 @@
                 aria-current="page"
                 data-i18n="sidebar.about"
                 >소개</a
+              >
+            </li>
+            <li>
+              <a
+                id="nav-thoughts"
+                class="nav-link"
+                href="#thoughts"
+                data-i18n="sidebar.thoughts"
+                >생각</a
               >
             </li>
           </ul>
@@ -210,7 +219,7 @@
         <main id="main-content" class="content" tabindex="-1">
           <!--
             소개는 첫 화면이다. 본문은 빌드가 README.md 를 옮겨 아래 자리표시자
-            자리에 끼워 넣는다(scripts/build-about.mjs). 원본은 저장소 루트의
+            자리에 끼워 넣는다(scripts/build-pages.mjs). 원본은 저장소 루트의
             README.md 하나뿐이라, 여기 소스에는 문서 사본을 두지 않는다.
 
             id 는 셸이 들고 생성 본문은 그 안에만 들어간다. main.js 가 잡는 것도
@@ -218,12 +227,12 @@
           -->
           <section
             id="about-panel"
-            class="panel about-panel"
+            class="panel doc-panel"
             data-i18n-aria-label="screen.about"
             aria-label="소개"
           >
-            <div class="panel-heading about-panel__heading">
-              <p class="about-panel__eyebrow" data-i18n="screen.about">소개</p>
+            <div class="panel-heading doc-panel__heading">
+              <p class="doc-panel__eyebrow" data-i18n="screen.about">소개</p>
               <a
                 class="about-cta"
                 id="about-cta"
@@ -232,8 +241,37 @@
                 >바로 돌려보기 →</a
               >
             </div>
-            <div class="about-doc" id="about-doc" tabindex="-1">
+            <div class="doc-body" id="about-doc" tabindex="-1">
               <!-- ABOUT-DOC -->
+            </div>
+          </section>
+
+          <!--
+            생각. 알고리즘을 어떻게 보아 왔는지에 대한 짧은 글이고, 본문은 소개와
+            같은 빌드 경로로 docs/algorithm-thoughts.md 에서 옮겨 온다.
+
+            글의 제목은 탑바가 화면 제목으로 들고, 본문에서는 뺀다 — 같은 문장이
+            바로 아래에 한 번 더 찍히지 않게 한다.
+          -->
+          <section
+            id="thoughts-panel"
+            class="panel doc-panel"
+            data-i18n-aria-label="screen.thoughts"
+            aria-label="알고리즘이라는 것"
+            hidden
+          >
+            <div class="panel-heading doc-panel__heading">
+              <!--
+                소개의 눈썹 문구는 p 지만 여기서는 h2 다. 소개 본문은 문서 제목을
+                h2 로 들고 있어 제목 층이 h1(탑바) → h2 → h3 로 이어지는데, 이
+                화면은 그 제목을 탑바로 올려 본문이 h3 부터 시작한다. 같은 자리에
+                층을 하나 세워 두면 건너뛰지 않는다. 보이는 모양은 눈썹 문구
+                그대로다 — 크기·무게는 클래스가 정한다.
+              -->
+              <h2 class="doc-panel__eyebrow" data-i18n="sidebar.thoughts">생각</h2>
+            </div>
+            <div class="doc-body" id="thoughts-doc" tabindex="-1">
+              <!-- THOUGHTS-DOC -->
             </div>
           </section>
 

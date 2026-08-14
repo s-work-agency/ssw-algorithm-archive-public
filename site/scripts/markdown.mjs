@@ -50,7 +50,7 @@ function plainText(markdown) {
 
 /**
  * GitHub의 제목 앵커 규칙을 그대로 따른다 — 소문자로 내리고, 문장부호를
- * 버리고, 공백을 하이픈으로 바꾼다. README 안의 절 링크(`#5-우선은-...`)가
+ * 버리고, 공백을 하이픈으로 바꾼다. README 안의 절 링크(`#6-우선은-...`)가
  * GitHub에서 쓰던 그 slug라, 규칙이 어긋나면 링크가 갈 곳을 잃는다.
  */
 export function slugify(text) {

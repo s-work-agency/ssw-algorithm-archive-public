@@ -24,6 +24,12 @@ const styles = await readFile(fileURLToPath(new URL("styles.css", deployRoot)), 
 const blobBase =
   "https://github.com/s-work-agency/ssw-algorithm-archive-public/blob/main/";
 
+/**
+ * 사이트가 화면으로 싣고 있는 문서. 이쪽으로 가는 링크는 blob 주소가 아니라 그
+ * 화면의 해시가 된다(scripts/build-pages.mjs의 siteDocuments와 같은 표다).
+ */
+const siteDocuments = { "docs/algorithm-thoughts.md": "#thoughts" };
+
 /** README 의 제목 줄 전부. `#` 개수와 문구를 그대로 들고 온다. */
 const readmeHeadings = [...readme.matchAll(/^(#{1,6})\s+(.+?)\s*$/gmu)].map(
   (matched) => ({ level: matched[1].length, text: matched[2] }),
@@ -71,8 +77,10 @@ test("README 의 모든 제목이 소개 본문에 그대로 있다", () => {
   }
 });
 
-test("docs 상대 링크가 GitHub blob 주소로 바뀌었다", () => {
-  const documentLinks = readmeLinks.filter((href) => href.startsWith("docs/"));
+test("사이트에 싣지 않는 docs 상대 링크가 GitHub blob 주소로 바뀌었다", () => {
+  const documentLinks = readmeLinks
+    .filter((href) => href.startsWith("docs/"))
+    .filter((href) => !(href in siteDocuments));
   assert.ok(documentLinks.length > 0, "README 에 docs 링크가 없습니다.");
   for (const href of documentLinks) {
     assert.ok(
@@ -82,6 +90,33 @@ test("docs 상대 링크가 GitHub blob 주소로 바뀌었다", () => {
   }
   // 사이트에는 docs/ 가 실리지 않는다. 상대 경로가 하나라도 남으면 404 가 된다.
   assert.ok(!page.includes('href="docs/'), "docs 상대 링크가 남아 있습니다.");
+});
+
+test("사이트가 싣고 있는 문서로 가는 링크는 그 화면의 해시가 된다", () => {
+  /*
+    같은 글이 사이트 안에 화면으로 있는데도 GitHub 의 마크다운 원문으로 내보내면,
+    읽던 사람이 사이트 밖으로 나간다. blob 주소로 새지 않는지까지 함께 본다.
+  */
+  // 네비에도 같은 해시가 있으므로, 보는 자리는 소개 본문 안으로 좁힌다.
+  const aboutBody = page.slice(
+    page.indexOf('id="about-doc"'),
+    page.indexOf('id="thoughts-panel"'),
+  );
+  assert.ok(aboutBody.length > 0, "소개 본문을 읽지 못했습니다.");
+  for (const [source, screenHash] of Object.entries(siteDocuments)) {
+    assert.ok(
+      readmeLinks.includes(source),
+      `README 에서 ${source} 로 가는 링크가 사라졌습니다.`,
+    );
+    assert.ok(
+      aboutBody.includes(`href="${screenHash}"`),
+      `화면 해시로 바뀌지 않았습니다: ${source}`,
+    );
+    assert.ok(
+      !page.includes(`${blobBase}${source}`),
+      `blob 주소로 나갔습니다: ${source}`,
+    );
+  }
 });
 
 test("본문 절 앵커는 #about/ 아래에 있고 갈 제목이 실제로 있다", () => {
@@ -313,7 +348,7 @@ test("표는 본문 컬럼 폭에 맞춰 서고 남는 폭은 마지막 열이 �
   // 표만 더 넓으면 짧은 표가 그 폭을 못 채워 설명 열 뒤로 빈 자리가 남는다.
   assert.match(
     styles,
-    /\.about-doc > \.table-wrap \{[^}]*max-width: var\(--doc-measure\)/u,
+    /\.doc-body > \.table-wrap \{[^}]*max-width: var\(--doc-measure\)/u,
   );
   assert.match(styles, /\.doc-table \{[^}]*min-width: 0/u);
   assert.match(
@@ -334,24 +369,22 @@ test("소개 본문이 문서 조판 클래스를 달고 나온다", () => {
   }
 });
 
-test("소개 문서의 모든 블록이 하나의 가운데 축을 쓴다", () => {
+test("문서의 모든 블록이 하나의 가운데 축을 쓴다", () => {
   /*
     폭은 요소마다 달라도 되지만 가운데 축은 하나여야 한다. 축이 갈라졌던 원인은
     margin 단축 속성이었다. margin: 0 0 1.4rem 은 좌우를 0으로 함께 덮어
     margin-inline: auto 를 지우고, 그 요소만 왼쪽으로 치우친 축에 세운다.
     인용 카드·구분선·코드·흐름도가 실제로 그렇게 어긋나 있었다.
 
-    그래서 여기서 잠그는 것은 개별 요소가 아니라 그 원인이다. 소개 문서 규칙
-    어디에도 margin 단축 속성이 없어야 한다. 새 블록이 추가돼도 같은 함정을
-    다시 밟지 않는다.
+    그래서 여기서 잠그는 것은 개별 요소가 아니라 그 원인이다. 문서 조판 규칙
+    어디에도 margin 단축 속성이 없어야 한다. 새 블록이 추가돼도, 읽을거리 화면이
+    늘어도 같은 함정을 다시 밟지 않는다.
   */
-  assert.match(styles, /\.about-doc > \* \{[^}]*margin-inline: auto/u);
-  assert.match(styles, /\.about-doc > \* \{[^}]*max-width: var\(--doc-measure\)/u);
-  const aboutRules = [
-    ...styles.matchAll(/(\.about-doc[^{]*|\.doc-[a-z-]+[^{]*)\{([^}]*)\}/gu),
-  ];
-  assert.ok(aboutRules.length > 10, "소개 문서 규칙을 읽지 못했습니다.");
-  const offenders = aboutRules
+  assert.match(styles, /\.doc-body > \* \{[^}]*margin-inline: auto/u);
+  assert.match(styles, /\.doc-body > \* \{[^}]*max-width: var\(--doc-measure\)/u);
+  const documentRules = [...styles.matchAll(/(\.doc-[a-z-]+[^{]*)\{([^}]*)\}/gu)];
+  assert.ok(documentRules.length > 10, "문서 조판 규칙을 읽지 못했습니다.");
+  const offenders = documentRules
     .filter(([, , body]) => /(^|;|\s)margin:\s/u.test(body))
     .map(([, selector]) => selector.trim());
   assert.deepEqual(
@@ -363,11 +396,11 @@ test("소개 문서의 모든 블록이 하나의 가운데 축을 쓴다", () =
 
 test("본문 컬럼과 CTA 가 카드 안에서 가운데로 놓인다", () => {
   // 왼쪽에 붙여 두면 넓은 화면에서 오른쪽에만 큰 여백이 남는다.
-  assert.match(styles, /\.about-doc > \* \{[^}]*margin-inline: auto/u);
-  assert.match(styles, /\.about-panel__heading \{[^}]*margin-inline: auto/u);
+  assert.match(styles, /\.doc-body > \* \{[^}]*margin-inline: auto/u);
+  assert.match(styles, /\.doc-panel__heading \{[^}]*margin-inline: auto/u);
   // CTA 줄은 본문 컬럼과 같은 폭을 써야 버튼이 카드 구석으로 떠나지 않는다.
   assert.match(
     styles,
-    /\.about-panel__heading \{[^}]*width: min\(100%, var\(--doc-measure\)\)/u,
+    /\.doc-panel__heading \{[^}]*width: min\(100%, var\(--doc-measure\)\)/u,
   );
 });
