@@ -121,7 +121,7 @@ test("제목 층이 h1 다음에서 건너뛰지 않는다", () => {
 
 test("원고의 모든 절 제목이 본문에 그대로 있다", () => {
   const sections = headings.filter((heading) => heading.level > 1);
-  assert.ok(sections.length >= 2, "원고 절 제목을 읽지 못했습니다.");
+  assert.ok(sections.length >= 4, "원고 절 제목을 읽지 못했습니다.");
   for (const heading of sections) {
     // 원문 레벨보다 한 칸 내려 쓴다 — 화면 제목 h1 은 탑바가 든다.
     const tag = `h${Math.min(6, heading.level + 1)}`;
