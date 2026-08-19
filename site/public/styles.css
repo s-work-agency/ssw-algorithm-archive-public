@@ -109,8 +109,14 @@
   --topbar-height: 3.9rem;
   --anchor-offset: calc(var(--topbar-height) + 1rem);
 
-  /* 타이포 */
-  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  /*
+    타이포. 한글은 Pretendard 가 맡는다. Inter 만 앞세우면 라틴 글리프만 받고
+    한글은 시스템 글꼴(맑은 고딕 등)로 떨어져 한 문장 안에서 서체가 갈린다.
+    Pretendard 의 라틴은 Inter 계열이라 그 뒤의 폴백과도 결이 맞는다.
+  */
+  --font-sans:
+    "Pretendard Variable", Pretendard, Inter, ui-sans-serif, system-ui,
+    sans-serif;
   --font-mono: Consolas, "Cascadia Code", monospace;
 }
 

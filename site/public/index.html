@@ -13,6 +13,15 @@
       content="설명·계약·테스트·언어별 원본 코드와 커버리지 현황을 제공하는 SSW Algorithm Archive"
     />
     <title>SSW Algorithm Archive</title>
+    <!--
+      본문 글꼴은 Pretendard 가변 폰트의 동적 서브셋이다. 유니코드 범위별로
+      쪼갠 조각 중 화면에 실제로 쓰인 글자의 조각만 내려받는다. 외부 요청은
+      하지 않으므로 CDN 이 아니라 ./fonts/ 아래 사본을 읽는다.
+    -->
+    <link
+      rel="stylesheet"
+      href="./fonts/pretendard/pretendardvariable-dynamic-subset.css"
+    />
     <link rel="stylesheet" href="./styles.css" />
     <!--
       main.js 는 module 이라 늦게 실행된다. 저장된 다크 설정을 첫 페인트 전에
