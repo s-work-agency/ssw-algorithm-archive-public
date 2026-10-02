@@ -78,6 +78,8 @@
   --status-success-strong: #247145;
   --status-warning-bg: #fff1c9;
   --status-warning-text: #835c00;
+  --status-edited-bg: #ffedd5;
+  --status-edited-text: #9a3412;
   --status-danger-bg: #fde8eb;
   --status-danger-text: #a4293e;
   --status-danger-strong: #af2d42;
@@ -197,6 +199,8 @@
   --status-success-strong: #7fe3ad;
   --status-warning-bg: #35290a;
   --status-warning-text: #f0c964;
+  --status-edited-bg: #431407;
+  --status-edited-text: #fdba74;
   --status-danger-bg: #3a1520;
   --status-danger-text: #ff9aad;
   --status-danger-strong: #ff8fa3;
@@ -1507,7 +1511,7 @@ select:focus {
 }
 
 /*
-  기대값과 실행 결과는 대조하라고 나란히 있는 두 값이라 좌우 2열로 세운다.
+  선택한 공식 케이스의 원래 입력과 기대값을 좌우 2열로 세운다.
   auto-fit + minmax 라 칸이 좁아지는 폭(모바일, 사이드바가 넓은 창)에서는 저절로
   한 열로 접혀 위아래로 쌓인다 — 접히는 지점을 미디어 쿼리로 따로 정하지 않는다.
 
@@ -1533,6 +1537,11 @@ select:focus {
 .source-run__pane > .code-block {
   display: grid;
   grid-template-rows: auto 1fr;
+}
+
+/* 큰 케이스도 원본 값 영역 안에서 스크롤해, 아래의 편집 입력을 밀어내지 않는다. */
+.source-run__case-values .json-block {
+  max-height: 16rem;
 }
 
 .table-wrap {
@@ -1814,6 +1823,12 @@ select:focus {
 .status-badge[data-status="rejected"] {
   background: var(--status-danger-bg);
   color: var(--status-danger-text);
+}
+
+/* 수정 입력은 성공·실패 판정과 구분되는 주황 칩으로 양 테마에서 표시한다. */
+.status-badge[data-status="edited"] {
+  background: var(--status-edited-bg);
+  color: var(--status-edited-text);
 }
 
 /*

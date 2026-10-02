@@ -59,9 +59,10 @@ import {
   type UiLanguage,
 } from "./ui-strings.js";
 import {
+  canonicalJson,
   defaultRunTimeoutMilliseconds,
   javaScriptAdapter,
-  judgeCase,
+  judgeRun,
   parseVectorCase,
   runJavaScriptCase,
   type RunOutcome,
@@ -1825,7 +1826,7 @@ function main(): void {
 
   /**
    * 벡터 실행기. 검증을 통과해 받아 둔 소스 바이트와 공식 벡터 케이스를 워커로 넘겨
-   * 실제로 돌리고, 케이스가 선언한 기대값과 대조한 판정을 그 자리에 남긴다.
+   * 실제로 돌린다. 원래 입력은 케이스의 기대값으로 판정하고, 수정 입력은 별도로 알린다.
    *
    * 소스와 벡터 모두 화면이 이미 쓰는 검증 로더를 그대로 부른다. 로더가 경로+해시로
    * 캐시하므로 요청이 늘지 않고, 검증을 건너뛰는 우회 경로도 생기지 않는다.
@@ -1862,6 +1863,10 @@ function main(): void {
     const caseSelect = element("select");
     caseLabelText.textContent = t("run.caseLabel");
     caseLabel.append(caseLabelText, caseSelect);
+    // 선택한 공식 케이스의 원본 값은 편집 영역과 분리해 실행 전후 항상 보여 준다.
+    const caseValues = element("div", "source-run__panes source-run__case-values");
+    caseValues.setAttribute("role", "group");
+    caseValues.setAttribute("aria-label", t("run.caseValues"));
     const inputLabel = element("label", "source-run__field");
     const inputLabelText = element("span");
     const inputArea = element("textarea");
@@ -1871,7 +1876,7 @@ function main(): void {
     inputArea.rows = 8;
     inputArea.spellcheck = false;
     inputLabel.append(inputLabelText, inputArea);
-    controls.append(caseLabel, inputLabel);
+    controls.append(caseLabel, caseValues, inputLabel);
 
     const actions = element("div", "source-run__actions");
     const runButton = element("button", "source-retry-button");
@@ -1889,6 +1894,7 @@ function main(): void {
     // 자산이 도착하기 전에는 조작을 막는다. 빈 값으로 눌러 실패를 보여 주는 것보다
     // 누를 수 없는 편이 상태를 정직하게 드러낸다.
     caseSelect.disabled = true;
+    inputArea.disabled = true;
     runButton.disabled = true;
     resetButton.disabled = true;
     result.replaceChildren(show(t("run.loading")));
@@ -1899,11 +1905,38 @@ function main(): void {
     const selectedCase = (): VectorCase | undefined =>
       cases[Number(caseSelect.value)];
 
+    /** 케이스의 원본 값과 실행 결과를 동일한 제목·복사 가능한 JSON 블록으로 만든다. */
+    const pane = (
+      label: string,
+      ...content: readonly HTMLElement[]
+    ): HTMLElement => {
+      const host = element("div", "source-run__pane");
+      const heading = element("p", "source-run__block-label");
+      heading.textContent = label;
+      host.append(heading, ...content);
+      return host;
+    };
+
     const fillInput = (): void => {
       const current = selectedCase();
       inputArea.value = current
         ? JSON.stringify(current.input, null, 2)
         : "";
+      if (!current) {
+        caseValues.replaceChildren();
+        return;
+      }
+      caseValues.replaceChildren(
+        pane(t("run.caseInput"), jsonBlock(current.input)),
+        pane(
+          t("run.expected"),
+          jsonBlock(
+            "error" in current.expected
+              ? { error: current.expected.error }
+              : { output: current.expected.output },
+          ),
+        ),
+      );
     };
 
     const paintVerdict = (
@@ -1911,46 +1944,27 @@ function main(): void {
       outcome: RunOutcome,
       edited: boolean,
     ): void => {
-      const verdict = judgeCase(current.expected, outcome);
+      const verdict = judgeRun(current.expected, outcome, edited);
       const badge = element("span", "status-badge");
       const summary = element("p", "source-run__verdict");
-      // 배지 색은 기존 상태 배지 어휘를 그대로 빌린다. 새 색을 만들지 않는다.
+      // 수정 입력의 주황 칩은 실행 모드만 알린다. 공식 케이스만 통과·실패 색을 받는다.
       const badgeStatus =
-        verdict.kind === "passed"
-          ? "approved"
-          : verdict.kind === "failed"
-            ? "rejected"
-            : "pending";
+        verdict.kind === "edited"
+          ? "edited"
+          : verdict.kind === "passed"
+            ? "approved"
+            : verdict.kind === "failed"
+              ? "rejected"
+              : "pending";
       badge.dataset.status = badgeStatus;
       badge.textContent = t(`run.verdict.${verdict.kind}`);
       summary.append(badge);
-      // 입력을 고쳐 돌렸으면 기대값 대조는 참고일 뿐이다. 그 사실을 함께 밝힌다.
+      // 수정 입력은 위의 원본 케이스 기대값과 대조하지 않는다는 점을 밝힌다.
       if (edited) {
         const note = element("span", "source-run__note");
         note.textContent = t("run.editedNote");
         summary.append(note);
       }
-      // 기대값과 실행 결과는 대조하라고 있는 두 값이라 좌우로 나란히 세운다.
-      // 한 칸은 제목 + 본문 두 줄짜리 격자이고, 두 칸이 같은 격자 행에 서기 때문에
-      // 본문 높이가 서로 달라도 칸 자체는 같은 높이로 맞춰진다. 좁은 화면에서는
-      // 칸이 접혀 위아래로 쌓인다(styles.css의 .source-run__panes).
-      const pane = (label: string, ...content: readonly HTMLElement[]) => {
-        const host = element("div", "source-run__pane");
-        const heading = element("p", "source-run__block-label");
-        heading.textContent = label;
-        host.append(heading, ...content);
-        return host;
-      };
-
-      const expectedPane = pane(
-        t("run.expected"),
-        jsonBlock(
-          "error" in current.expected
-            ? { error: current.expected.error }
-            : { output: current.expected.output },
-        ),
-      );
-
       let actualBody: HTMLElement;
       if (outcome.status === "output") {
         actualBody = jsonBlock({ output: outcome.output });
@@ -1966,9 +1980,8 @@ function main(): void {
         actualBody = show(t("run.crashedDetail", { message: outcome.message }));
       }
 
-      const panes = element("div", "source-run__panes");
-      panes.append(expectedPane, pane(t("run.actual"), actualBody));
-      result.replaceChildren(summary, panes);
+      // 원본 값은 위에 고정하고, 버튼 아래에는 이번 실행의 실제 결과만 추가한다.
+      result.replaceChildren(summary, pane(t("run.actual"), actualBody));
     };
 
     const attemptRun = (): void => {
@@ -1982,8 +1995,8 @@ function main(): void {
           throw new TypeError("입력 JSON 루트는 객체여야 합니다.");
         }
         input = raw as Record<string, unknown>;
-        edited =
-          JSON.stringify(input) !== JSON.stringify(current.input);
+        // 공백이나 객체 키 순서만 바꾼 것은 입력 값의 변경으로 보지 않는다.
+        edited = canonicalJson(input) !== canonicalJson(current.input);
       } catch {
         // 사용자가 고친 JSON이 깨진 것은 실행 실패가 아니다. 워커를 띄우지 않고
         // 그 자리에서만 알린다.
@@ -1991,6 +2004,9 @@ function main(): void {
         return;
       }
       runButton.disabled = true;
+      caseSelect.disabled = true;
+      resetButton.disabled = true;
+      inputArea.disabled = true;
       result.replaceChildren(show(t("run.running")));
       void runJavaScriptCase({ source: sourceText, adapter, input })
         .then((outcome) => {
@@ -2001,6 +2017,9 @@ function main(): void {
         })
         .finally(() => {
           runButton.disabled = false;
+          caseSelect.disabled = false;
+          resetButton.disabled = false;
+          inputArea.disabled = false;
         });
     };
 
@@ -2047,6 +2066,7 @@ function main(): void {
           }),
         );
         caseSelect.disabled = false;
+        inputArea.disabled = false;
         runButton.disabled = false;
         resetButton.disabled = false;
         fillInput();

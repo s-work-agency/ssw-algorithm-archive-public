@@ -3,8 +3,8 @@
  *
  * 돌리는 바이트는 화면이 이미 무결성 검증을 통과해 받아 둔 소스 문자열 그 자체다.
  * 실행하려고 따로 받아오지 않는다 — 호출자가 검증된 로더에서 얻은 텍스트를 넘긴다.
- * 입력은 함께 벤더링한 공식 벡터의 케이스이고, 결과는 그 케이스가 선언한 기대값과
- * 대조한다.
+ * 공식 벡터의 입력을 그대로 실행했을 때만 그 케이스의 기대값과 대조한다.
+ * 사용자가 입력을 바꾼 실행은 비교 기준이 없으므로 입력 변경 상태와 실제 결과를 보여 준다.
  *
  * 격리
  * - 실행은 Blob URL Worker 안에서만 일어난다. 화면 DOM에 손댈 수 없고, 무한 루프가
@@ -192,4 +192,12 @@ export function judgeCase(expected, outcome) {
     return canonicalJson(outcome.output) === canonicalJson(expected.output)
         ? { kind: "passed" }
         : { kind: "failed", reason: "output" };
+}
+/**
+ * 원래 케이스와 값이 같은 입력만 공식 기대값으로 판정한다.
+ * 수정 입력은 결과가 우연히 같거나 오류를 반환해도 공식 케이스의 성공·실패로 취급하지 않는다.
+ * 시간 초과와 실행 오류의 실제 내용은 호출자가 RunOutcome 그대로 표시한다.
+ */
+export function judgeRun(expected, outcome, edited) {
+    return edited ? { kind: "edited" } : judgeCase(expected, outcome);
 }
